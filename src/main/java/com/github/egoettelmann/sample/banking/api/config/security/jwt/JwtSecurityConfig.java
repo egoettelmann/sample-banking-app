@@ -1,5 +1,7 @@
-package com.github.egoettelmann.sample.banking.api.config.security.noauth;
+package com.github.egoettelmann.sample.banking.api.config.security.jwt;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -22,11 +24,16 @@ import java.util.Collections;
  * To be used for development purpose only.
  */
 @Configuration
-@Profile("no-auth")
-public class NoAuthSecurityConfig {
+@Profile("!no-auth")
+public class JwtSecurityConfig {
 
     /**
-     * The 'no-auth' authorization filter.
+     * The key to encrypt/decrypt JWT tokens
+     */
+    private static final String SECRET = "SecretJWTKey";
+
+    /**
+     * The 'JWT' authorization filter.
      *
      * @return the filter
      */
@@ -35,10 +42,22 @@ public class NoAuthSecurityConfig {
         return new OncePerRequestFilter() {
             @Override
             protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
-                // Extracting username from headers
-                String username = request.getHeader("username");
+                // Extracting the token from the headers
+                String authHeader = request.getHeader("Authorization");
+                if (authHeader == null) {
+                    chain.doFilter(request, response);
+                    return;
+                }
+                String token = authHeader.replace("Bearer ", "");
+
+                // Extracting username from token
+                String username = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
+                        .build()
+                        .verify(token)
+                        .getSubject();
                 if (username == null) {
-                    username = "no-auth";
+                    chain.doFilter(request, response);
+                    return;
                 }
 
                 // Building the user details
