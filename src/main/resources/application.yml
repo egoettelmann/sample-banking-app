@@ -1,0 +1,8 @@
+# Spring properties
+spring:
+
+  # Removes the white label error page
+  resources:
+    add-mappings: false
+  mvc:
+    throw-exception-if-no-handler-found: true
