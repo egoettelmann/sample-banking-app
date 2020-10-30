@@ -1,10 +1,13 @@
 package com.github.egoettelmann.sample.auth.api.config.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.egoettelmann.sample.auth.api.config.AppProperties;
+import com.github.egoettelmann.sample.auth.api.core.dtos.TokenHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.Authentication;
@@ -34,6 +37,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final SecurityProblemSupport securityProblemSupport;
 
     /**
+     * The object mapper
+     */
+    private final ObjectMapper objectMapper;
+
+    /**
      * The app properties
      */
     private final AppProperties appProperties;
@@ -42,15 +50,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
      * Instantiates the Rest Security Config.
      *
      * @param securityProblemSupport the security errors handler
+     * @param objectMapper           the object mapper
      * @param appProperties          the application properties
      */
     @Autowired
     public SecurityConfig(
             final SecurityProblemSupport securityProblemSupport,
+            final ObjectMapper objectMapper,
             final AppProperties appProperties
     ) {
         super();
         this.securityProblemSupport = securityProblemSupport;
+        this.objectMapper = objectMapper;
         this.appProperties = appProperties;
     }
 
@@ -88,6 +99,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         // Enabling CORS
         http.cors();
+
+        http.csrf().disable();
     }
 
     /**
@@ -115,7 +128,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             @Override
             public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
                 log.info("Login successful");
-                clearAuthenticationAttributes(request);
+                try {
+                    TokenHolder tokenHolder = new TokenHolder();
+                    tokenHolder.setToken("BLABLA");
+                    String jwtResponse = objectMapper.writeValueAsString(tokenHolder);
+                    response.setContentType("application/json");
+                    response.getWriter().write(jwtResponse);
+                    clearAuthenticationAttributes(request);
+                } catch (Exception e) {
+                    log.error("Problem generating token: ", e);
+                    securityProblemSupport.commence(request, response, new AuthenticationServiceException("Could not generate token", e));
+                }
             }
         };
     }
