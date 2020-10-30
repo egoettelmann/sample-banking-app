@@ -2,13 +2,15 @@ package com.github.egoettelmann.sample.banking.api.config.security.jwt;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.interfaces.Claim;
+import com.auth0.jwt.interfaces.DecodedJWT;
+import com.github.egoettelmann.sample.banking.api.core.dtos.AppUser;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.Filter;
@@ -50,19 +52,22 @@ public class JwtSecurityConfig {
                 }
                 String token = authHeader.replace("Bearer ", "");
 
-                // Extracting username from token
-                String username = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
+                // Extracting username and userId from token
+                DecodedJWT jwt = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
                         .build()
-                        .verify(token)
-                        .getSubject();
-                if (username == null) {
+                        .verify(token);
+                String username = jwt.getSubject();
+                Claim userIdClaim = jwt.getClaim("userId");
+                if (username == null || userIdClaim.isNull()) {
                     chain.doFilter(request, response);
                     return;
                 }
 
                 // Building the user details
-                User user = new User(username, "", Collections.emptyList());
-                Authentication authentication = new UsernamePasswordAuthenticationToken(user, user.getPassword(), user.getAuthorities());
+                AppUser user = new AppUser();
+                user.setId(userIdClaim.asLong());
+                user.setUsername(username);
+                Authentication authentication = new UsernamePasswordAuthenticationToken(user, "", Collections.emptyList());
 
                 // Defining the security context
                 SecurityContextHolder.getContext().setAuthentication(authentication);
