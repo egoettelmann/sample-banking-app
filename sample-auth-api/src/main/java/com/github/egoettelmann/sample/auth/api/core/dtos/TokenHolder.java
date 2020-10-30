@@ -5,6 +5,6 @@ import lombok.Data;
 @Data
 public class TokenHolder {
 
-    private String token;
+    private final String token;
 
 }
