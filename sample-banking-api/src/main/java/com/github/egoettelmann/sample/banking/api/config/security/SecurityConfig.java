@@ -77,6 +77,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         // Custom exception handling
         http.exceptionHandling()
+                .authenticationEntryPoint(securityProblemSupport)
                 .accessDeniedHandler(securityProblemSupport);
 
         // Enabling CORS
