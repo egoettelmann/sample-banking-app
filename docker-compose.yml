@@ -1,0 +1,22 @@
+# Use root/example as user/password credentials
+version: '3.1'
+
+services:
+
+  # Api
+  api:
+    build: ./sample-banking-api/
+    ports:
+      - 9090:8080
+    environment:
+      # Spring profile
+      SPRING_PROFILES_ACTIVE: prod
+
+  # Auth
+  auth:
+    build: ./sample-auth-api/
+    ports:
+      - 9091:8080
+    environment:
+      # Spring profile
+      SPRING_PROFILES_ACTIVE: prod
