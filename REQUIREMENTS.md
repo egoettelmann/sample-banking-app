@@ -19,7 +19,7 @@
 - [ ] Provide automated integration tests
 - [ ] Register a fraud tentative when the user attempts a payment to forbidden accounts and block the account in case of more than 5 fraud tentative.
 - [ ] Architecture authentication, account listing and payment in separate micro-services
-- [ ] Provide a Docker build(s) to run the application in containers
+- [x] Provide a Docker build(s) to run the application in containers
 - [ ] Enforce a password policy on user password update
 - [x] Use a database migration framework
 - [x] Provide a Swagger specification
@@ -29,4 +29,6 @@
 ## Further improvements
 
 - [ ] User identification is based on technical id (auto-generated)
-  - [ ] Banking API should have email or other business id to identify users
+  - Banking API should have email or other business id to identify users
+- [ ] Replace the auth-api with a proper Authorization Server
+  - An idea could be to integrate Keycloak (<https://hub.docker.com/r/jboss/keycloak/>) and seed it with a JSON import dump file
