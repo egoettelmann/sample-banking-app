@@ -2,7 +2,7 @@
 
 ## Main requirements
 
-- [ ] Authentication
+- [x] Authentication
 - [x] List the bank accounts
 - [ ] Create single payment
 - [ ] List all payments
@@ -12,7 +12,7 @@
 
 ## Optional requirements
 
-- [ ] Password should not be stored as plaintext in the database
+- [x] Password should not be stored as plaintext in the database
 - [ ] Payment execution process should be part of a single transaction
 - [x] Implement a pagination mechanism for the list of created payments
 - [ ] Implement unit test coverage up to 100%
@@ -25,3 +25,8 @@
 - [x] Provide a Swagger specification
 - [ ] User model has an additional property "photo"
 - [x] Enable CORS
+
+## Further improvements
+
+- [ ] User identification is based on technical id (auto-generated)
+  - [ ] Banking API should have email or other business id to identify users

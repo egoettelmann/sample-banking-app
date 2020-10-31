@@ -5,6 +5,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.github.egoettelmann.sample.banking.api.core.dtos.AppUser;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -25,6 +26,7 @@ import java.util.Collections;
  * Allows to bypass security by defining a user through a header.
  * To be used for development purpose only.
  */
+@Slf4j
 @Configuration
 @Profile("!no-auth")
 public class JwtSecurityConfig {
@@ -53,11 +55,19 @@ public class JwtSecurityConfig {
                 String token = authHeader.replace("Bearer ", "");
 
                 // Extracting username and userId from token
-                DecodedJWT jwt = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-                        .build()
-                        .verify(token);
-                String username = jwt.getSubject();
-                Claim userIdClaim = jwt.getClaim("userId");
+                String username;
+                Claim userIdClaim;
+                try {
+                    DecodedJWT jwt = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
+                            .build()
+                            .verify(token);
+                    username = jwt.getSubject();
+                    userIdClaim = jwt.getClaim("userId");
+                } catch (Exception e) {
+                    log.error("Could not verify token: {}", token, e);
+                    chain.doFilter(request, response);
+                    return;
+                }
                 if (username == null || userIdClaim.isNull()) {
                     chain.doFilter(request, response);
                     return;

@@ -2,9 +2,9 @@ package com.github.egoettelmann.sample.auth.api.config.security;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.github.egoettelmann.sample.auth.api.core.dtos.AppUserDetails;
 import com.github.egoettelmann.sample.auth.api.core.dtos.TokenHolder;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -29,9 +29,12 @@ public class JwtTokenGenerator {
      * @return the token holder
      */
     public TokenHolder buildToken(Authentication authentication) {
+        AppUserDetails principal = (AppUserDetails) authentication.getPrincipal();
         String token = JWT.create()
-                .withSubject(((User) authentication.getPrincipal()).getUsername())
                 .withExpiresAt(new Date(System.currentTimeMillis() + VALIDITY_IN_MS))
+                .withIssuedAt(new Date(System.currentTimeMillis()))
+                .withSubject(principal.getUsername())
+                .withClaim("userId", principal.getUserId())
                 .sign(Algorithm.HMAC512(SECRET.getBytes()));
         return new TokenHolder(token);
     }
