@@ -11,11 +11,17 @@ import java.math.BigDecimal;
 @Service
 public class DefaultPaymentValidationService implements PaymentValidationService {
 
+    private final ForbiddenIbanRepository forbiddenIbanRepository;
+
     private final RestIbanService restIbanService;
 
     @Autowired
-    public DefaultPaymentValidationService(RestIbanService restIbanService) {
+    public DefaultPaymentValidationService(
+            ForbiddenIbanRepository forbiddenIbanRepository,
+            RestIbanService restIbanService
+    ) {
         this.restIbanService = restIbanService;
+        this.forbiddenIbanRepository = forbiddenIbanRepository;
     }
 
     @Override
@@ -54,7 +60,9 @@ public class DefaultPaymentValidationService implements PaymentValidationService
         // TODO: get latest balance from DB and compare amount
 
         // Checking for forbidden accounts
-        // TODO: check if account number is in database of forbidden accounts
+        if (forbiddenIbanRepository.existsByIban(payment.getBeneficiaryAccountNumber())) {
+            throw new InvalidPaymentException("Payment to provided account number is not allowed");
+        }
     }
 
 }

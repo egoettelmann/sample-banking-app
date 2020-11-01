@@ -1,0 +1,2 @@
+INSERT INTO forbidden_iban (iban) VALUES ('LU280019400644750000');
+INSERT INTO forbidden_iban (iban) VALUES ('LU120010001234567891');
