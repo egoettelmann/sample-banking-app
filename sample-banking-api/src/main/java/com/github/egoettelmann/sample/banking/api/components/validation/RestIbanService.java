@@ -34,22 +34,24 @@ class RestIbanService {
         final String uri = UriComponentsBuilder.fromPath(VALIDATION_URL)
                 .buildAndExpand(iban)
                 .toUriString();
+        OpenIbanValidationResponse validationResponse;
         try {
             ResponseEntity<OpenIbanValidationResponse> response = restTemplate.exchange(uri, HttpMethod.GET, buildRequestEntity(), OpenIbanValidationResponse.class);
-            OpenIbanValidationResponse validationResponse = response.getBody();
-            if (validationResponse == null) {
-                throw new InvalidPaymentException("IBAN validation service exception: no response");
-            }
-            if (!validationResponse.isValid()) {
-                String errorMessage = DEFAULT_VALIDATION_MESSAGE;
-                if (validationResponse.getMessages() != null && !validationResponse.getMessages().isEmpty()) {
-                    errorMessage = validationResponse.getMessages().get(0);
-                }
-                throw new InvalidPaymentException("IBAN validation failed: " + errorMessage);
-            }
+            validationResponse = response.getBody();
         } catch (Exception e) {
             log.error("An error occurred while calling the remote IBAN service: ", e);
             throw new InvalidPaymentException("IBAN validation service exception");
+        }
+
+        if (validationResponse == null) {
+            throw new InvalidPaymentException("IBAN validation service exception: no response");
+        }
+        if (!validationResponse.isValid()) {
+            String errorMessage = DEFAULT_VALIDATION_MESSAGE;
+            if (validationResponse.getMessages() != null && !validationResponse.getMessages().isEmpty()) {
+                errorMessage = validationResponse.getMessages().get(0);
+            }
+            throw new InvalidPaymentException("IBAN validation failed: " + errorMessage);
         }
     }
 
