@@ -11,7 +11,7 @@
   - [ ] Payments to this given list of forbidden accounts should not be valid
   - [ ] Giver account balance should be decreased when a payment is executed ...
   - [ ] ... and increased if the beneficiary is an account that belongs to the bank
-  - [ ] Call an external web service to validate the IBAN format of the beneficiary
+  - [x] Call an external web service to validate the IBAN format of the beneficiary
 - [ ] List all payments
   - [x] Provide a REST endpoint to list all created payments ordered by creation date
   - [ ] Provide a REST endpoint to list all created payments to a given beneficiaryAccountNumber and within a given period ordered by creation date

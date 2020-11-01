@@ -13,4 +13,6 @@ public class AppProperties {
 
     private List<String> allowedOrigins;
 
+    private String ibanApiUrl;
+
 }

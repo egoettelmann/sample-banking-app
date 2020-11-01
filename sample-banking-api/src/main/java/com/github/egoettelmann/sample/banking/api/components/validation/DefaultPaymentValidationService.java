@@ -3,12 +3,20 @@ package com.github.egoettelmann.sample.banking.api.components.validation;
 import com.github.egoettelmann.sample.banking.api.core.PaymentValidationService;
 import com.github.egoettelmann.sample.banking.api.core.dtos.Payment;
 import com.github.egoettelmann.sample.banking.api.core.exceptions.InvalidPaymentException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 
 @Service
 public class DefaultPaymentValidationService implements PaymentValidationService {
+
+    private final RestIbanService restIbanService;
+
+    @Autowired
+    public DefaultPaymentValidationService(RestIbanService restIbanService) {
+        this.restIbanService = restIbanService;
+    }
 
     @Override
     public void validateInternalPayment(Payment payment) {
@@ -20,7 +28,7 @@ public class DefaultPaymentValidationService implements PaymentValidationService
         validatePayment(payment);
 
         // Checking valid IBAN
-        // TODO: call remote web service
+        restIbanService.validate(payment.getBeneficiaryAccountNumber());
     }
 
     private void validatePayment(Payment payment) {

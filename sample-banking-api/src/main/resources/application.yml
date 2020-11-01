@@ -10,3 +10,7 @@ spring:
   # Flyway
   flyway:
     locations: "classpath:migrations/{vendor}"
+
+# App properties
+banking-api:
+  iban-api-url: https://openiban.com/
