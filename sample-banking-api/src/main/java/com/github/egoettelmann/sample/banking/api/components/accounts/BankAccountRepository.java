@@ -10,4 +10,8 @@ interface BankAccountRepository extends PagingAndSortingRepository<BankAccountDb
 
     Page<BankAccountDbo> findAllByUserId(Long userId, Pageable pageable);
 
+    BankAccountDbo getByIdAndUserId(Long bankAccountId, Long userId);
+
+    BankAccountDbo getByAccountNumber(String accountNumber);
+
 }

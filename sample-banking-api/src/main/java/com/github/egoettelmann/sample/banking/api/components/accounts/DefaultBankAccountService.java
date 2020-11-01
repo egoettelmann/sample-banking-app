@@ -8,6 +8,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 class DefaultBankAccountService implements BankAccountService {
 
@@ -20,6 +22,20 @@ class DefaultBankAccountService implements BankAccountService {
 
     @Override
     public Page<BankAccount> getBankAccountsForUser(AppUser user, Pageable pageable) {
-        return sqlBankAccountRepositoryService.getBankAccountsForUserId(user.getId(), pageable);
+        return sqlBankAccountRepositoryService.getAllForUserId(user.getId(), pageable);
+    }
+
+    @Override
+    public Optional<BankAccount> getBankAccountForUserById(AppUser user, Long bankAccountId) {
+        return Optional.ofNullable(
+                sqlBankAccountRepositoryService.getOneForUserId(bankAccountId, user.getId())
+        );
+    }
+
+    @Override
+    public Optional<BankAccount> getBankAccountByAccountNumber(String accountNumber) {
+        return Optional.ofNullable(
+                sqlBankAccountRepositoryService.getOneByAccountNumber(accountNumber)
+        );
     }
 }

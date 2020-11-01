@@ -26,4 +26,11 @@ class SqlPaymentRepositoryService {
         return paymentRepository.findAllByGiverAccountId(userId, pageable).map(paymentMapper::to);
     }
 
+    public Payment savePayment(Payment payment) {
+        PaymentDbo dbo = paymentRepository.save(
+                paymentMapper.from(payment)
+        );
+        return paymentMapper.to(dbo);
+    }
+
 }

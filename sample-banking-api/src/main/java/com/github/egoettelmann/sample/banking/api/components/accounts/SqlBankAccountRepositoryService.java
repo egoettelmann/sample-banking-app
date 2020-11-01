@@ -22,8 +22,18 @@ class SqlBankAccountRepositoryService {
         this.bankAccountMapper = bankAccountMapper;
     }
 
-    public Page<BankAccount> getBankAccountsForUserId(Long userId, Pageable pageable) {
+    public Page<BankAccount> getAllForUserId(Long userId, Pageable pageable) {
         return bankAccountRepository.findAllByUserId(userId, pageable).map(bankAccountMapper::to);
+    }
+
+    public BankAccount getOneForUserId(Long bankAccountId, Long userId) {
+        BankAccountDbo dbo = bankAccountRepository.getByIdAndUserId(bankAccountId, userId);
+        return bankAccountMapper.to(dbo);
+    }
+
+    public BankAccount getOneByAccountNumber(String bankAccountNumber) {
+        BankAccountDbo dbo = bankAccountRepository.getByAccountNumber(bankAccountNumber);
+        return bankAccountMapper.to(dbo);
     }
 
 }
