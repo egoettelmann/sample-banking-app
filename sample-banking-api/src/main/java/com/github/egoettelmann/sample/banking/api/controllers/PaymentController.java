@@ -1,8 +1,8 @@
 package com.github.egoettelmann.sample.banking.api.controllers;
 
-import com.github.egoettelmann.sample.banking.api.core.BankAccountsService;
+import com.github.egoettelmann.sample.banking.api.core.PaymentService;
 import com.github.egoettelmann.sample.banking.api.core.dtos.AppUser;
-import com.github.egoettelmann.sample.banking.api.core.dtos.BankAccount;
+import com.github.egoettelmann.sample.banking.api.core.dtos.Payment;
 import org.springdoc.core.converters.PageableAsQueryParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -12,20 +12,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("bank-accounts")
-public class BankAccountsController {
+@RequestMapping("/payments")
+public class PaymentController {
 
-    private final BankAccountsService bankAccountsService;
+    private final PaymentService paymentService;
 
     @Autowired
-    public BankAccountsController(BankAccountsService bankAccountsService) {
-        this.bankAccountsService = bankAccountsService;
+    public PaymentController(PaymentService paymentService) {
+        this.paymentService = paymentService;
     }
 
     @GetMapping
     @PageableAsQueryParam
-    public Page<BankAccount> findAllBankAccounts(Pageable pageable) {
-        return bankAccountsService.getBankAccountsForUser(AppUser.current(), pageable);
+    public Page<Payment> findAllPayments(Pageable pageable) {
+        return paymentService.getPaymentsForUser(AppUser.current(), pageable);
     }
 
 }

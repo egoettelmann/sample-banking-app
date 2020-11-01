@@ -1,12 +1,12 @@
 package com.github.egoettelmann.sample.banking.api.core;
 
 import com.github.egoettelmann.sample.banking.api.core.dtos.AppUser;
-import com.github.egoettelmann.sample.banking.api.core.dtos.BankAccount;
+import com.github.egoettelmann.sample.banking.api.core.dtos.Payment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-public interface BankAccountsService {
+public interface PaymentService {
 
-    Page<BankAccount> getBankAccountsForUser(AppUser user, Pageable pageable);
+    Page<Payment> getPaymentsForUser(AppUser user, Pageable pageable);
 
 }

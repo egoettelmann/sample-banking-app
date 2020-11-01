@@ -10,7 +10,7 @@ import javax.persistence.Table;
 @Data
 @Entity
 @Table(name = "bank_account")
-class BankAccountDbo {
+public class BankAccountDbo {
 
     @Id
     @Column(name = "id")

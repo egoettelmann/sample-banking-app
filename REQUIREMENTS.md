@@ -5,7 +5,7 @@
 - [x] Authentication
 - [x] List the bank accounts
 - [ ] Create single payment
-- [ ] List all payments
+- [x] List all payments
 - [ ] Delete payment
 - [ ] Update User info
 - [ ] Logout endpoint
