@@ -5,7 +5,9 @@
 - [x] Authentication
 - [x] List the bank accounts
 - [ ] Create single payment
-- [x] List all payments
+- [ ] List all payments
+  - [x] Provide a REST endpoint to list all created payments ordered by creation date
+  - [ ] Provide a REST endpoint to list all created payments to a given beneficiaryAccountNumber and within a given period ordered by creation date
 - [ ] Delete payment
 - [ ] Update User info
 - [ ] Logout endpoint
