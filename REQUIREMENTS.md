@@ -8,7 +8,7 @@
   - [x] The giver account should belong to the authenticated user
   - [x] Payments to the same account number should not be valid
   - [ ] Payments that exceed the available balance of the account should not be valid
-  - [ ] Payments to this given list of forbidden accounts should not be valid
+  - [x] Payments to this given list of forbidden accounts should not be valid
   - [ ] Giver account balance should be decreased when a payment is executed ...
   - [ ] ... and increased if the beneficiary is an account that belongs to the bank
   - [x] Call an external web service to validate the IBAN format of the beneficiary
@@ -37,8 +37,8 @@
 
 ## Further improvements
 
+- [ ] Docker Compose: apps should wait that DBs are available before starting
 - [ ] User identification is based on technical id (auto-generated)
   - Banking API should have email or other business id to identify users
 - [ ] Replace the auth-api with a proper Authorization Server
   - An idea could be to integrate Keycloak (<https://hub.docker.com/r/jboss/keycloak/>) and seed it with a JSON import dump file
-- [ ] Docker-compose: apps should wait that DBs are available before starting

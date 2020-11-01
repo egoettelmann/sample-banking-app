@@ -26,7 +26,6 @@ services:
     image: postgres
     restart: always
     volumes:
-      - ./database/api-db/data:/var/lib/postgresql/data
       - ./database/api-db/init:/docker-entrypoint-initdb.d
     environment:
       POSTGRES_USER: apidb
@@ -37,7 +36,6 @@ services:
     image: postgres
     restart: always
     volumes:
-      - ./database/auth-db/data:/var/lib/postgresql/data
       - ./database/auth-db/init:/docker-entrypoint-initdb.d
     environment:
       POSTGRES_USER: authdb

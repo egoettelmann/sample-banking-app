@@ -10,7 +10,7 @@ Requirements for the project are defined in [REQUIREMENTS.md](REQUIREMENTS.md).
 
 Simply start the application through Docker Compose:
 ```shell script
-docker-compose up --build
+docker-compose up --build -V
 ```
 
 This will build the images and run the following services:
@@ -42,24 +42,3 @@ The app is split in 2 services:
    - more details are available here: [sample-banking-api/README.MD](./sample-banking-api/README.md)
  - `auth-api`, a SpringBoot application backed by a PostgreSQL database
    - more details are available here: [sample-auth-api/README.MD](./sample-auth-api/README.md)
-
-## Configuration options
-
-### Available Spring profiles
-
-Feature flags:
- - `no-auth` disables any need for authentication by creating a default user on each request
-
-Environments:
- - `local` runs the application in standalone mode with following features:
-   - `no-auth`
- - `docker`
- - `prod`
-
-## Development tips
-
-During development, the application can be run in standalone mode:
-
-```shell script
-mvn spring-boot:run -Dspring-boot.run.profiles=local
-```
