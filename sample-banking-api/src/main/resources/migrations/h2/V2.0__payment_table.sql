@@ -1,7 +1,7 @@
 CREATE TABLE payment (
     id LONG AUTO_INCREMENT PRIMARY KEY,
     amount NUMERIC,
-    currency VARCHAR(20) UNIQUE,
+    currency VARCHAR(20),
     giver_account_id LONG,
     beneficiary_account_number TEXT,
     beneficiary_name TEXT,
