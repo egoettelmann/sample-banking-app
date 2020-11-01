@@ -34,3 +34,4 @@
   - Banking API should have email or other business id to identify users
 - [ ] Replace the auth-api with a proper Authorization Server
   - An idea could be to integrate Keycloak (<https://hub.docker.com/r/jboss/keycloak/>) and seed it with a JSON import dump file
+- [ ] Docker-compose: apps should wait that DBs are available before starting

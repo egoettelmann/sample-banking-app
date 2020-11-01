@@ -82,6 +82,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         // Enabling CORS
         http.cors();
+
+        // Disabling CSRF: useless with JWT authentication
+        http.csrf().disable();
     }
 
     /**
