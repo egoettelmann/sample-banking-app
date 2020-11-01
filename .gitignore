@@ -1,7 +1,10 @@
 target/
-!sample-banking-api/.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
+
+### Database files ###
+database/api-db/data/*
+database/auth-db/data/*
 
 ### STS ###
 .apt_generated

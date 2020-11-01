@@ -2,10 +2,20 @@ spring:
 
   # Datasource
   datasource:
-    url: jdbc:h2:mem:testdb
-    driverClassName: org.h2.Driver
+    url: jdbc:postgresql://api-db:5432/apidb
+    driverClassName: org.postgresql.Driver
+    username: apidb
+    password: password
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    properties:
+      hibernate:
+        globally_quoted_identifiers: true
+
+  # Flyway
+  flyway:
+    enabled: false
+
 
 # App properties
 banking-api:

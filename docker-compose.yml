@@ -20,3 +20,25 @@ services:
     environment:
       # Spring profile
       SPRING_PROFILES_ACTIVE: prod
+
+  # Api Database
+  api-db:
+    image: postgres
+    restart: always
+    volumes:
+      - ./database/api-db/data:/var/lib/postgresql/data
+      - ./database/api-db/init:/docker-entrypoint-initdb.d
+    environment:
+      POSTGRES_USER: apidb
+      POSTGRES_PASSWORD: password
+
+  # Auth Database
+  auth-db:
+    image: postgres
+    restart: always
+    volumes:
+      - ./database/auth-db/data:/var/lib/postgresql/data
+      - ./database/auth-db/init:/docker-entrypoint-initdb.d
+    environment:
+      POSTGRES_USER: authdb
+      POSTGRES_PASSWORD: password
