@@ -14,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.time.ZonedDateTime;
 import java.util.Optional;
 
@@ -46,6 +47,7 @@ class DefaultPaymentService implements PaymentService {
         return sqlPaymentRepositoryService.getPaymentsForUserId(user.getId(), pageable);
     }
 
+    @Transactional
     @Override
     public Payment createPayment(AppUser user, PaymentRequest paymentRequest) {
         // Retrieving giver account
@@ -82,6 +84,7 @@ class DefaultPaymentService implements PaymentService {
         return sqlPaymentRepositoryService.savePayment(payment);
     }
 
+    @Transactional
     @Override
     public void deletePayment(AppUser user, Long paymentId) {
         // Retrieving the payment (and checking that it belongs to the user)

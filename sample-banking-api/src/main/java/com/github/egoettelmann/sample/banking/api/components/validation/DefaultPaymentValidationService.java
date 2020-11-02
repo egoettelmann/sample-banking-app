@@ -8,6 +8,7 @@ import com.github.egoettelmann.sample.banking.api.core.dtos.PaymentStatus;
 import com.github.egoettelmann.sample.banking.api.core.exceptions.InvalidPaymentException;
 import com.github.egoettelmann.sample.banking.api.core.exceptions.payment.ForbiddenIbanException;
 import com.github.egoettelmann.sample.banking.api.core.exceptions.payment.PaymentBeneficiarySameAsGiverAccountException;
+import com.github.egoettelmann.sample.banking.api.core.exceptions.payment.PaymentCannotBeDeletedException;
 import com.github.egoettelmann.sample.banking.api.core.exceptions.payment.PaymentExceedsAccountBalanceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -50,7 +51,7 @@ public class DefaultPaymentValidationService implements PaymentValidationService
     @Override
     public void validatePaymentDeletion(Payment payment) {
         if (PaymentStatus.EXECUTED.equals(payment.getStatus())) {
-            throw new InvalidPaymentException("An executed payment cannot be deleted");
+            throw new PaymentCannotBeDeletedException("An executed payment cannot be deleted");
         }
     }
 
