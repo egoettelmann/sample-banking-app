@@ -9,7 +9,7 @@ import java.util.List;
 @Repository
 interface BalanceRepository extends CrudRepository<BalanceDbo, Long> {
 
-    List<BalanceDbo> findAllByAccountId(Long accountId);
+    List<BalanceDbo> findAllByAccountIdAndAccountUserId(Long accountId, Long userId);
 
     BalanceDbo getByAccountIdAndStatus(Long accountId, BalanceStatus status);
 

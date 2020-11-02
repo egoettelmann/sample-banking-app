@@ -1,6 +1,7 @@
 package com.github.egoettelmann.sample.banking.api.components.balances;
 
 import com.github.egoettelmann.sample.banking.api.core.BalanceService;
+import com.github.egoettelmann.sample.banking.api.core.dtos.AppUser;
 import com.github.egoettelmann.sample.banking.api.core.dtos.Balance;
 import com.github.egoettelmann.sample.banking.api.core.dtos.BalanceStatus;
 import com.github.egoettelmann.sample.banking.api.core.dtos.BankAccount;
@@ -8,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 class DefaultBalanceService implements BalanceService {
@@ -17,6 +19,11 @@ class DefaultBalanceService implements BalanceService {
     @Autowired
     public DefaultBalanceService(SqlBalanceRepositoryService sqlBalanceRepositoryService) {
         this.sqlBalanceRepositoryService = sqlBalanceRepositoryService;
+    }
+
+    @Override
+    public List<Balance> getBalancesForUserAndAccount(AppUser user, Long accountId) {
+        return sqlBalanceRepositoryService.getBalancesForUserIdAndAccountId(user.getId(), accountId);
     }
 
     @Override

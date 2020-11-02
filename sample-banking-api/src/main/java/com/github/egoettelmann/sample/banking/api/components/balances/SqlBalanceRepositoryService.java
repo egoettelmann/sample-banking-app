@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 class SqlBalanceRepositoryService {
@@ -24,11 +23,10 @@ class SqlBalanceRepositoryService {
         this.balanceMapper = balanceMapper;
     }
 
-    public List<Balance> getBalancesForAccountId(Long accountId) {
-        return balanceRepository.findAllByAccountId(accountId)
-                .stream()
-                .map(balanceMapper::to)
-                .collect(Collectors.toList());
+    public List<Balance> getBalancesForUserIdAndAccountId(Long userId, Long accountId) {
+        return balanceMapper.to(
+                balanceRepository.findAllByAccountIdAndAccountUserId(accountId, userId)
+        );
     }
 
     public Balance getBalanceForAccountIdAndStatus(Long accountId, BalanceStatus status) {
