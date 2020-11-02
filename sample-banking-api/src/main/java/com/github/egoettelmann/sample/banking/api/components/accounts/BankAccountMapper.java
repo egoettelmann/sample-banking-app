@@ -4,7 +4,7 @@ import com.github.egoettelmann.sample.banking.api.core.dtos.BankAccount;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
-interface BankAccountMapper {
+public interface BankAccountMapper {
 
     BankAccount to(BankAccountDbo dbo);
 
