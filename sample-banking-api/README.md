@@ -9,8 +9,11 @@ Feature flags:
 
 Environments:
  - `local` used to run the application in standalone mode, with following features:
-   - `no-auth`
+   - `no-auth` profile
+   - embedded H2 in-memory database 
  - `docker` used when running the service in a Docker container
+   - `no-auth` profile
+   - embedded H2 in-memory database
  - `prod` used when running the entire stack (through Docker Compose)
 
 ## Development tips

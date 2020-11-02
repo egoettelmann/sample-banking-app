@@ -5,8 +5,10 @@
 ### Available Spring profiles
 
 Environments:
- - `local` used to run the application in standalone mode
+ - `local` used to run the application in standalone mode, with following features:
+   - embedded H2 in-memory database 
  - `docker` used when running the service in a Docker container
+   - embedded H2 in-memory database
  - `prod` used when running the entire stack (through Docker Compose)
 
 ## Development tips
