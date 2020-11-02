@@ -16,7 +16,7 @@
   - [x] Provide a REST endpoint to list all created payments ordered by creation date
   - [ ] Provide a REST endpoint to list all created payments to a given beneficiaryAccountNumber and within a given period ordered by creation date
 - [x] Delete payment
-- [ ] Update User info
+- [x] Update User info
 - [ ] Logout endpoint
 
 ## Optional requirements
@@ -25,12 +25,11 @@
 - [x] Payment execution process should be part of a single transaction
 - [x] Implement a pagination mechanism for the list of created payments
 - [ ] Implement unit test coverage up to 100%
-  - [x] 77%
 - [ ] Provide automated integration tests
 - [ ] Register a fraud tentative when the user attempts a payment to forbidden accounts and block the account in case of more than 5 fraud tentative.
 - [ ] Architecture authentication, account listing and payment in separate micro-services
 - [x] Provide a Docker build(s) to run the application in containers
-- [ ] Enforce a password policy on user password update
+- [x] Enforce a password policy on user password update
 - [x] Use a database migration framework
 - [x] Provide a Swagger specification
 - [ ] User model has an additional property "photo"

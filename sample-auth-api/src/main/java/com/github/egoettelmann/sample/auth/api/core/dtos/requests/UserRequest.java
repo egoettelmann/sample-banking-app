@@ -1,13 +1,12 @@
 package com.github.egoettelmann.sample.auth.api.core.dtos.requests;
 
+import com.github.egoettelmann.sample.auth.api.core.validation.ValidPassword;
 import lombok.Data;
-
-import javax.validation.constraints.NotNull;
 
 @Data
 public class UserRequest {
 
-    @NotNull
+    @ValidPassword
     private String password;
     private String address;
 
