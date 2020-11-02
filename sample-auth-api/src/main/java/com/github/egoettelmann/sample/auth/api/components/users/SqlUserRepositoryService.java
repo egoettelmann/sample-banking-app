@@ -20,10 +20,22 @@ class SqlUserRepositoryService {
         this.userMapper = userMapper;
     }
 
+    public User getUserById(final Long userId) {
+        return userMapper.to(
+                userRepository.findById(userId).orElse(null)
+        );
+    }
+
     public User getUserByUsername(final String username) {
         return userMapper.to(
                 userRepository.findByUsername(username)
         );
     }
 
+    public User updateUser(User user) {
+        UserDbo dbo = userMapper.from(user);
+        return userMapper.to(
+                userRepository.save(dbo)
+        );
+    }
 }
