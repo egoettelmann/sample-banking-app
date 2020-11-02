@@ -1,6 +1,7 @@
 package com.github.egoettelmann.sample.banking.api.components.validation;
 
 import com.github.egoettelmann.sample.banking.api.core.exceptions.InvalidPaymentException;
+import com.github.egoettelmann.sample.banking.api.core.exceptions.payment.InvalidIbanException;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -51,7 +52,7 @@ class RestIbanService {
             if (validationResponse.getMessages() != null && !validationResponse.getMessages().isEmpty()) {
                 errorMessage = validationResponse.getMessages().get(0);
             }
-            throw new InvalidPaymentException("IBAN validation failed: " + errorMessage);
+            throw new InvalidIbanException("IBAN validation failed: " + errorMessage);
         }
     }
 

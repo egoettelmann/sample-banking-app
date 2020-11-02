@@ -4,7 +4,7 @@
 
 - [x] Authentication
 - [x] List the bank accounts
-- [ ] Create single payment
+- [x] Create single payment
   - [x] The giver account should belong to the authenticated user
   - [x] Payments to the same account number should not be valid
   - [x] Payments that exceed the available balance of the account should not be valid

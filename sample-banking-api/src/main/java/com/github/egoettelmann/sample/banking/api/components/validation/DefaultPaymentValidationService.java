@@ -6,6 +6,9 @@ import com.github.egoettelmann.sample.banking.api.core.dtos.Balance;
 import com.github.egoettelmann.sample.banking.api.core.dtos.Payment;
 import com.github.egoettelmann.sample.banking.api.core.dtos.PaymentStatus;
 import com.github.egoettelmann.sample.banking.api.core.exceptions.InvalidPaymentException;
+import com.github.egoettelmann.sample.banking.api.core.exceptions.payment.ForbiddenIbanException;
+import com.github.egoettelmann.sample.banking.api.core.exceptions.payment.PaymentBeneficiarySameAsGiverAccountException;
+import com.github.egoettelmann.sample.banking.api.core.exceptions.payment.PaymentExceedsAccountBalanceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -67,18 +70,18 @@ public class DefaultPaymentValidationService implements PaymentValidationService
 
         // Checking that the account number is not the same
         if (payment.getBeneficiaryAccountNumber().equals(payment.getGiverAccount().getAccountNumber())) {
-            throw new InvalidPaymentException("Payments to the same account number are not valid");
+            throw new PaymentBeneficiarySameAsGiverAccountException("Payments to the same account number are not valid");
         }
 
         // Checking that balance allows payment
         Balance giverBalance = balanceService.getEndOfDayBalanceForAccount(payment.getGiverAccount().getId());
         if (giverBalance.getAmount().compareTo(payment.getAmount()) < 0) {
-            throw new InvalidPaymentException("Payment exceeds available balance of account");
+            throw new PaymentExceedsAccountBalanceException("Payment exceeds available balance of account");
         }
 
         // Checking for forbidden accounts
         if (forbiddenIbanRepository.existsByIban(payment.getBeneficiaryAccountNumber())) {
-            throw new InvalidPaymentException("Payment to provided account number is not allowed");
+            throw new ForbiddenIbanException("Payment to provided account number is not allowed");
         }
     }
 
