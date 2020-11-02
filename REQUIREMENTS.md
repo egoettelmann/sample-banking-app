@@ -37,6 +37,7 @@
 
 ## Further improvements
 
+- [ ] currency is not handled: sync currency of payments with balance
 - [ ] Docker Compose: apps should wait that DBs are available before starting
 - [ ] User identification is based on technical id (auto-generated)
   - Banking API should have email or other business id to identify users

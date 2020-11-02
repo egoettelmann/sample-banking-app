@@ -1,12 +1,12 @@
 package com.github.egoettelmann.sample.banking.api.components.payments;
 
+import com.github.egoettelmann.sample.banking.api.core.BalanceService;
 import com.github.egoettelmann.sample.banking.api.core.BankAccountService;
 import com.github.egoettelmann.sample.banking.api.core.PaymentService;
 import com.github.egoettelmann.sample.banking.api.core.PaymentValidationService;
 import com.github.egoettelmann.sample.banking.api.core.dtos.AppUser;
 import com.github.egoettelmann.sample.banking.api.core.dtos.BankAccount;
 import com.github.egoettelmann.sample.banking.api.core.dtos.Payment;
-import com.github.egoettelmann.sample.banking.api.core.dtos.PaymentStatus;
 import com.github.egoettelmann.sample.banking.api.core.exceptions.DataNotFoundException;
 import com.github.egoettelmann.sample.banking.api.core.requests.PaymentRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,15 +26,19 @@ class DefaultPaymentService implements PaymentService {
 
     private final PaymentValidationService paymentValidationService;
 
+    private final BalanceService balanceService;
+
     @Autowired
     public DefaultPaymentService(
             SqlPaymentRepositoryService sqlPaymentRepositoryService,
             BankAccountService bankAccountService,
-            PaymentValidationService paymentValidationService
+            PaymentValidationService paymentValidationService,
+            BalanceService balanceService
     ) {
         this.sqlPaymentRepositoryService = sqlPaymentRepositoryService;
         this.bankAccountService = bankAccountService;
         this.paymentValidationService = paymentValidationService;
+        this.balanceService = balanceService;
     }
 
     @Override
@@ -44,12 +48,16 @@ class DefaultPaymentService implements PaymentService {
 
     @Override
     public Payment createPayment(AppUser user, PaymentRequest paymentRequest) {
+        // Retrieving giver account
         Optional<BankAccount> giverBankAccount = bankAccountService.getBankAccountForUserById(user, paymentRequest.getGiverAccountId());
+
+        // Checking that current user is authorized
         if (!giverBankAccount.isPresent()) {
             String message = String.format("BankAccount with id='%s' not found for userId='%s'", paymentRequest.getGiverAccountId(), user.getId());
             throw new DataNotFoundException(message);
         }
 
+        // Creating payment
         Payment payment = new Payment();
         payment.setAmount(paymentRequest.getAmount());
         payment.setCurrency(paymentRequest.getCurrency());
@@ -58,16 +66,19 @@ class DefaultPaymentService implements PaymentService {
         payment.setBeneficiaryName(paymentRequest.getBeneficiaryName());
         payment.setCommunication(paymentRequest.getCommunication());
         payment.setCreationDate(ZonedDateTime.now());
-        payment.setStatus(PaymentStatus.EXECUTED);
 
+        // Differentiating between internal and external payment
         Optional<BankAccount> beneficiaryBankAccount = bankAccountService.getBankAccountByAccountNumber(paymentRequest.getBeneficiaryAccountNumber());
         if (beneficiaryBankAccount.isPresent()) {
             paymentValidationService.validateInternalPayment(payment);
-            // TODO: create balance for beneficiary
+            balanceService.subtractAmountFromBalance(payment.getAmount(), giverBankAccount.get());
+            balanceService.addAmountToBalance(payment.getAmount(), beneficiaryBankAccount.get());
         } else {
             paymentValidationService.validateExternalPayment(payment);
+            balanceService.subtractAmountFromBalance(payment.getAmount(), giverBankAccount.get());
         }
 
+        // Saving
         return sqlPaymentRepositoryService.savePayment(payment);
     }
 }

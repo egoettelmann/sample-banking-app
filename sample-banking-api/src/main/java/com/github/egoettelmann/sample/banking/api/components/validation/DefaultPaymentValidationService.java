@@ -1,6 +1,8 @@
 package com.github.egoettelmann.sample.banking.api.components.validation;
 
+import com.github.egoettelmann.sample.banking.api.core.BalanceService;
 import com.github.egoettelmann.sample.banking.api.core.PaymentValidationService;
+import com.github.egoettelmann.sample.banking.api.core.dtos.Balance;
 import com.github.egoettelmann.sample.banking.api.core.dtos.Payment;
 import com.github.egoettelmann.sample.banking.api.core.exceptions.InvalidPaymentException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,15 +13,19 @@ import java.math.BigDecimal;
 @Service
 public class DefaultPaymentValidationService implements PaymentValidationService {
 
+    private final BalanceService balanceService;
+
     private final ForbiddenIbanRepository forbiddenIbanRepository;
 
     private final RestIbanService restIbanService;
 
     @Autowired
     public DefaultPaymentValidationService(
+            BalanceService balanceService,
             ForbiddenIbanRepository forbiddenIbanRepository,
             RestIbanService restIbanService
     ) {
+        this.balanceService = balanceService;
         this.restIbanService = restIbanService;
         this.forbiddenIbanRepository = forbiddenIbanRepository;
     }
@@ -57,7 +63,10 @@ public class DefaultPaymentValidationService implements PaymentValidationService
         }
 
         // Checking that balance allows payment
-        // TODO: get latest balance from DB and compare amount
+        Balance giverBalance = balanceService.getEndOfDayBalanceForAccount(payment.getGiverAccount().getId());
+        if (giverBalance.getAmount().compareTo(payment.getAmount()) < 0) {
+            throw new InvalidPaymentException("Payment exceeds available balance of account");
+        }
 
         // Checking for forbidden accounts
         if (forbiddenIbanRepository.existsByIban(payment.getBeneficiaryAccountNumber())) {
