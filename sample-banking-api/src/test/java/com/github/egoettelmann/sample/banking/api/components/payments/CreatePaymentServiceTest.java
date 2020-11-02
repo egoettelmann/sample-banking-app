@@ -7,6 +7,7 @@ import com.github.egoettelmann.sample.banking.api.core.dtos.Balance;
 import com.github.egoettelmann.sample.banking.api.core.dtos.BalanceStatus;
 import com.github.egoettelmann.sample.banking.api.core.dtos.Payment;
 import com.github.egoettelmann.sample.banking.api.core.exceptions.DataNotFoundException;
+import com.github.egoettelmann.sample.banking.api.core.exceptions.payment.InvalidIbanException;
 import com.github.egoettelmann.sample.banking.api.core.requests.PaymentRequest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -20,7 +21,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.test.annotation.DirtiesContext;
 
 import java.math.BigDecimal;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
@@ -173,6 +173,22 @@ public class CreatePaymentServiceTest {
         List<Balance> beneficiaryBalances = balanceService.getBalancesForUserAndAccount(beneficiary, 3L);
 
         Assertions.assertEquals(1, beneficiaryBalances.size(), "Wrong size of beneficiary balances");
+    }
+
+    @Test
+    public void whenCreatePaymentWithInvalidIban_throwsInvalidIban() {
+        AppUser appUser = buildUser(1L);
+
+        PaymentRequest paymentRequest = new PaymentRequest();
+        paymentRequest.setAmount(BigDecimal.valueOf(834.56));
+        paymentRequest.setCurrency("EUR");
+        paymentRequest.setGiverAccountId(1L);
+        paymentRequest.setBeneficiaryAccountNumber("INVALID_IBAN");
+        paymentRequest.setBeneficiaryName("Test Beneficiary");
+
+        Assertions.assertThrows(InvalidIbanException.class, () -> {
+            Payment payment = paymentService.createPayment(appUser, paymentRequest);
+        });
     }
 
     private AppUser buildUser(Long userId) {

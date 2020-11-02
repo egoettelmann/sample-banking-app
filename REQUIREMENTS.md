@@ -22,9 +22,10 @@
 ## Optional requirements
 
 - [x] Password should not be stored as plaintext in the database
-- [ ] Payment execution process should be part of a single transaction
+- [x] Payment execution process should be part of a single transaction
 - [x] Implement a pagination mechanism for the list of created payments
 - [ ] Implement unit test coverage up to 100%
+  - [x] 77%
 - [ ] Provide automated integration tests
 - [ ] Register a fraud tentative when the user attempts a payment to forbidden accounts and block the account in case of more than 5 fraud tentative.
 - [ ] Architecture authentication, account listing and payment in separate micro-services
