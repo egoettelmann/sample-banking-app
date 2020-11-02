@@ -2,15 +2,18 @@ package com.github.egoettelmann.sample.auth.api.config.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.egoettelmann.sample.auth.api.config.AppProperties;
+import com.github.egoettelmann.sample.auth.api.config.security.jwt.JwtTokenGenerator;
 import com.github.egoettelmann.sample.auth.api.core.dtos.TokenHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -20,11 +23,13 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.zalando.problem.spring.web.advice.security.SecurityProblemSupport;
 
+import javax.servlet.Filter;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -61,6 +66,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final AppProperties appProperties;
 
     /**
+     * The authorization filter
+     */
+    private final Filter authorizationFilter;
+
+    /**
      * Instantiates the Rest Security Config.
      *
      * @param userDetailsService     the user details service
@@ -68,6 +78,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
      * @param securityProblemSupport the security errors handler
      * @param objectMapper           the object mapper
      * @param appProperties          the application properties
+     * @param authorizationFilter    the authorization filter
      */
     @Autowired
     public SecurityConfig(
@@ -75,7 +86,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             final JwtTokenGenerator jwtTokenGenerator,
             final SecurityProblemSupport securityProblemSupport,
             final ObjectMapper objectMapper,
-            final AppProperties appProperties
+            final AppProperties appProperties,
+            @Qualifier("authorizationFilter") final Filter authorizationFilter
     ) {
         super();
         this.userDetailsService = userDetailsService;
@@ -83,6 +95,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         this.securityProblemSupport = securityProblemSupport;
         this.objectMapper = objectMapper;
         this.appProperties = appProperties;
+        this.authorizationFilter = authorizationFilter;
     }
 
     /**
@@ -102,6 +115,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.exceptionHandling()
                 .authenticationEntryPoint(securityProblemSupport)
                 .accessDeniedHandler(securityProblemSupport);
+
+        // Adding auth filters and disabling session
+        http.sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .addFilterBefore(authorizationFilter, BasicAuthenticationFilter.class);
 
         // Login
         http.formLogin()
