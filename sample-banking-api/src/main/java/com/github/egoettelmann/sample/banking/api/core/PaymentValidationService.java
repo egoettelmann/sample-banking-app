@@ -8,4 +8,6 @@ public interface PaymentValidationService {
 
     void validateExternalPayment(Payment payment);
 
+    void validatePaymentDeletion(Payment payment);
+
 }

@@ -26,6 +26,12 @@ class SqlPaymentRepositoryService {
         return paymentRepository.findAllByGiverAccountId(userId, pageable).map(paymentMapper::to);
     }
 
+    public Payment getPaymentForUserId(Long userId, Long paymentId) {
+        return paymentMapper.to(
+                paymentRepository.findByIdAndGiverAccountUserId(paymentId, userId)
+        );
+    }
+
     public Payment savePayment(Payment payment) {
         PaymentDbo dbo = paymentRepository.save(
                 paymentMapper.from(payment)
@@ -33,4 +39,7 @@ class SqlPaymentRepositoryService {
         return paymentMapper.to(dbo);
     }
 
+    public void deletePayment(Payment payment) {
+        paymentRepository.deleteById(payment.getId());
+    }
 }

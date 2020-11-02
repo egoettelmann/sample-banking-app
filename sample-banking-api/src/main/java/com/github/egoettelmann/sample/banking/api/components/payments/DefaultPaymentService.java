@@ -81,4 +81,30 @@ class DefaultPaymentService implements PaymentService {
         // Saving
         return sqlPaymentRepositoryService.savePayment(payment);
     }
+
+    @Override
+    public void deletePayment(AppUser user, Long paymentId) {
+        // Retrieving the payment (and checking that it belongs to the user)
+        Payment payment = sqlPaymentRepositoryService.getPaymentForUserId(user.getId(), paymentId);
+        if (payment == null) {
+            String message = String.format("Payment with id='%s' not found for userId='%s'", paymentId, user.getId());
+            throw new DataNotFoundException(message);
+        }
+
+        // Validating that it can be deleted
+        paymentValidationService.validatePaymentDeletion(payment);
+
+        // Differentiating between internal and external payment
+        Optional<BankAccount> beneficiaryBankAccount = bankAccountService.getBankAccountByAccountNumber(payment.getBeneficiaryAccountNumber());
+        if (beneficiaryBankAccount.isPresent()) {
+            balanceService.addAmountToBalance(payment.getAmount(), payment.getGiverAccount());
+            balanceService.subtractAmountFromBalance(payment.getAmount(), beneficiaryBankAccount.get());
+        } else {
+            balanceService.addAmountToBalance(payment.getAmount(), payment.getGiverAccount());
+        }
+
+        // Saving
+        sqlPaymentRepositoryService.deletePayment(payment);
+    }
+
 }

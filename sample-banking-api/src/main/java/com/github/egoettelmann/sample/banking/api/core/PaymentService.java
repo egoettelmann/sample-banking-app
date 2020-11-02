@@ -12,4 +12,6 @@ public interface PaymentService {
 
     Payment createPayment(AppUser user, PaymentRequest paymentRequest);
 
+    void deletePayment(AppUser user, Long paymentId);
+
 }

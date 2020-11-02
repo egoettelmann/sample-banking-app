@@ -40,4 +40,9 @@ public class PaymentController {
         return paymentService.createPayment(AppUser.current(), paymentRequest);
     }
 
+    @DeleteMapping("/{paymentId}")
+    public void deletePayment(@PathVariable("paymentId") Long paymentId) {
+        paymentService.deletePayment(AppUser.current(), paymentId);
+    }
+
 }

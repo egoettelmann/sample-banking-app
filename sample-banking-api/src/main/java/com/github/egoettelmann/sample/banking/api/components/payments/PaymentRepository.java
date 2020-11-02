@@ -8,6 +8,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 interface PaymentRepository extends PagingAndSortingRepository<PaymentDbo, Long> {
 
+    PaymentDbo findByIdAndGiverAccountUserId(Long paymentId, Long userId);
+
     Page<PaymentDbo> findAllByGiverAccountId(Long userId, Pageable pageable);
 
 }

@@ -7,15 +7,15 @@
 - [ ] Create single payment
   - [x] The giver account should belong to the authenticated user
   - [x] Payments to the same account number should not be valid
-  - [ ] Payments that exceed the available balance of the account should not be valid
+  - [x] Payments that exceed the available balance of the account should not be valid
   - [x] Payments to this given list of forbidden accounts should not be valid
-  - [ ] Giver account balance should be decreased when a payment is executed ...
-  - [ ] ... and increased if the beneficiary is an account that belongs to the bank
+  - [x] Giver account balance should be decreased when a payment is executed ...
+  - [x] ... and increased if the beneficiary is an account that belongs to the bank
   - [x] Call an external web service to validate the IBAN format of the beneficiary
 - [ ] List all payments
   - [x] Provide a REST endpoint to list all created payments ordered by creation date
   - [ ] Provide a REST endpoint to list all created payments to a given beneficiaryAccountNumber and within a given period ordered by creation date
-- [ ] Delete payment
+- [x] Delete payment
 - [ ] Update User info
 - [ ] Logout endpoint
 

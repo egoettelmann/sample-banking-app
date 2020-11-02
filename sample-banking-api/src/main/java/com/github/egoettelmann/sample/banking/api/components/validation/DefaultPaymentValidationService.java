@@ -4,6 +4,7 @@ import com.github.egoettelmann.sample.banking.api.core.BalanceService;
 import com.github.egoettelmann.sample.banking.api.core.PaymentValidationService;
 import com.github.egoettelmann.sample.banking.api.core.dtos.Balance;
 import com.github.egoettelmann.sample.banking.api.core.dtos.Payment;
+import com.github.egoettelmann.sample.banking.api.core.dtos.PaymentStatus;
 import com.github.egoettelmann.sample.banking.api.core.exceptions.InvalidPaymentException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -41,6 +42,13 @@ public class DefaultPaymentValidationService implements PaymentValidationService
 
         // Checking valid IBAN
         restIbanService.validate(payment.getBeneficiaryAccountNumber());
+    }
+
+    @Override
+    public void validatePaymentDeletion(Payment payment) {
+        if (PaymentStatus.EXECUTED.equals(payment.getStatus())) {
+            throw new InvalidPaymentException("An executed payment cannot be deleted");
+        }
     }
 
     private void validatePayment(Payment payment) {
