@@ -8,6 +8,9 @@ spring:
     password: password
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+    properties:
+      hibernate:
+        globally_quoted_identifiers: true
 
   # Flyway
   flyway:
