@@ -2,7 +2,8 @@
 
 Sample project implementing a banking REST Web Service.
 
-Requirements for the project are defined in [REQUIREMENTS.md](REQUIREMENTS.md).
+Requirements for the project, their fulfillment and proposed improvements can be found here:
+[REQUIREMENTS.md](REQUIREMENTS.md).
 
 ## Usage
 
