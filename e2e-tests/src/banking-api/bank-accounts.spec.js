@@ -38,9 +38,9 @@ describe('Bank accounts for user 1', async () => {
                 res.body.content.should.be.a("array");
                 expect(res.body.content.length).to.equal(2);
                 res.body.content[0].should.have.property("accountNumber");
-                expect(res.body.content[0].accountNumber).to.equal("LU120010001234567891");
+                expect(res.body.content[0].accountNumber).to.equal("LU510011111111111111");
                 res.body.content[1].should.have.property("accountNumber");
-                expect(res.body.content[1].accountNumber).to.equal("LU120010001234567892");
+                expect(res.body.content[1].accountNumber).to.equal("LU090012222222222222");
                 done();
             });
     });
@@ -67,9 +67,9 @@ describe('Bank accounts for user 2', async () => {
                 res.body.content.should.be.a("array");
                 expect(res.body.content.length).to.equal(2);
                 res.body.content[0].should.have.property("accountNumber");
-                expect(res.body.content[0].accountNumber).to.equal("LU220010001234567891");
+                expect(res.body.content[0].accountNumber).to.equal("LU640013333333333333");
                 res.body.content[1].should.have.property("accountNumber");
-                expect(res.body.content[1].accountNumber).to.equal("LU220010001234567892");
+                expect(res.body.content[1].accountNumber).to.equal("LU220014444444444444");
                 done();
             });
     });

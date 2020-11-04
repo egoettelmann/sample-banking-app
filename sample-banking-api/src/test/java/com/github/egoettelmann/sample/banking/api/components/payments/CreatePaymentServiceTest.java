@@ -53,7 +53,7 @@ public class CreatePaymentServiceTest {
         paymentRequest.setAmount(BigDecimal.valueOf(834.56));
         paymentRequest.setCurrency("EUR");
         paymentRequest.setGiverAccountId(1L);
-        paymentRequest.setBeneficiaryAccountNumber("LU120010001234567892");
+        paymentRequest.setBeneficiaryAccountNumber("LU090012222222222222");
         paymentRequest.setBeneficiaryName("Test Beneficiary");
 
         Payment payment = paymentService.createPayment(appUser, paymentRequest);
@@ -72,7 +72,7 @@ public class CreatePaymentServiceTest {
         paymentRequest.setAmount(BigDecimal.valueOf(834.56));
         paymentRequest.setCurrency("EUR");
         paymentRequest.setGiverAccountId(1L);
-        paymentRequest.setBeneficiaryAccountNumber("LU120010001234567892");
+        paymentRequest.setBeneficiaryAccountNumber("LU090012222222222222");
         paymentRequest.setBeneficiaryName("Test Beneficiary");
 
         Assertions.assertThrows(DataNotFoundException.class, () -> {
@@ -88,7 +88,7 @@ public class CreatePaymentServiceTest {
         paymentRequest.setAmount(BigDecimal.valueOf(800.00));
         paymentRequest.setCurrency("EUR");
         paymentRequest.setGiverAccountId(1L);
-        paymentRequest.setBeneficiaryAccountNumber("LU120010001234567892");
+        paymentRequest.setBeneficiaryAccountNumber("LU090012222222222222");
         paymentRequest.setBeneficiaryName("Test Beneficiary");
 
         Assertions.assertDoesNotThrow(() -> {
@@ -116,7 +116,7 @@ public class CreatePaymentServiceTest {
         paymentRequest.setAmount(BigDecimal.valueOf(70.00));
         paymentRequest.setCurrency("EUR");
         paymentRequest.setGiverAccountId(1L);
-        paymentRequest.setBeneficiaryAccountNumber("LU220010001234567891");
+        paymentRequest.setBeneficiaryAccountNumber("LU640013333333333333");
         paymentRequest.setBeneficiaryName("Test Beneficiary");
 
         Assertions.assertDoesNotThrow(() -> {
@@ -158,7 +158,7 @@ public class CreatePaymentServiceTest {
         paymentRequest.setAmount(BigDecimal.valueOf(300.00));
         paymentRequest.setCurrency("EUR");
         paymentRequest.setGiverAccountId(1L);
-        paymentRequest.setBeneficiaryAccountNumber("LU220010001234567891");
+        paymentRequest.setBeneficiaryAccountNumber("LU640013333333333333");
         paymentRequest.setBeneficiaryName("Test Beneficiary");
 
         Mockito.doThrow(new DataIntegrityViolationException("Save failed")).when(sqlPaymentRepositoryService).savePayment(Mockito.any());
