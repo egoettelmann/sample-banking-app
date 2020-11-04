@@ -39,13 +39,24 @@ The same token can be used on the authentication API to update the user info.
 
 ### Play around
 
-Following accounts are configured:
+Following accounts are configured to create and delete payments:
  - `user1@test.com`:
    - 'LU120010001234567891', with an initial balance of `1,000.00 EUR`
    - 'LU120010001234567892', with an initial balance of `0.00 EUR`
  - `user2@test.com`
    - 'LU220010001234567891', with an initial balance of `1,000.00 EUR`
    - 'LU220010001234567892', with an initial balance of `0.00 EUR`
+
+## End-2-end tests
+
+The end-2-end tests are written with Mocha/Chai and can be executed within a Docker container.
+
+```shell script
+docker-compose -f docker-compose.yml -f docker-compose.test.yml up --build --abort-on-container-exit -V
+```
+
+This will start the entire stack, with the additional test container.
+Once the tests done, all containers will stop, with the exit code of the test.
 
 ## Project overview
 
@@ -60,11 +71,11 @@ Both applications follow a [package-by-component](http://www.codingthearchitectu
 ### Technical stack
 
  - JWT Authentication 
-   - token generated with `com.auth0:java-jwt`
+   - tokens are generated with `com.auth0:java-jwt`
    - both services share a common secret to encode/decode the token
  - DB migrations are managed with Flyway
-   - with the `prod` profile, `Flyway` is disabled and databases are setup through dumps 
- - Mapping is done through `Mapstruct`
+   - with the `prod` profile, `Flyway` is disabled and databases are setup through dumps
+ - Mapping is done with `Mapstruct`
  - Rest error handling is done with `org.zalando:problem-spring-web`
  - Rest endpoints are described with `springdoc-openapi` (Swagger for OpenAPI v3 specs)
  - Password policy relies on `Passay` 

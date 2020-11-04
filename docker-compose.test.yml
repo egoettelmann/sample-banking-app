@@ -1,0 +1,16 @@
+version: '3.1'
+
+services:
+
+  # The e2e tests
+  e2e-tests:
+    build: ./e2e-tests/
+    command: dockerize
+      -wait tcp://api:8080 -wait tcp://auth:8080 -timeout 60s
+      bash -c "npm run test"
+    environment:
+      AUTH_API_URL: http://auth:8080
+      BANKING_API_URL: http://api:8080
+    depends_on:
+      - api
+      - auth
