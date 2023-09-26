@@ -67,7 +67,7 @@ The app is split in 2 services:
  - `auth-api`, a SpringBoot application backed by a PostgreSQL database
    - more details are available here: [sample-auth-api/README.md](./sample-auth-api/README.md)
 
-Both applications follow a [package-by-component](http://www.codingthearchitecture.com/2015/03/08/package_by_component_and_architecturally_aligned_testing.html) structure.
+Both applications follow a [package-by-component](https://dzone.com/articles/package-component-and) structure.
 
 ### Technical stack
 

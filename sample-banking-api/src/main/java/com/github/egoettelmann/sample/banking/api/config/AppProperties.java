@@ -11,6 +11,9 @@ import java.util.List;
 @ConfigurationProperties(prefix = "banking-api")
 public class AppProperties {
 
+    /**
+     * Allowed origins for CORS calls
+     */
     private List<String> allowedOrigins;
 
     private String ibanApiUrl;

@@ -14,3 +14,4 @@ spring:
 # App properties
 banking-api:
   iban-api-url: https://openiban.com/
+  allowed-origins: http://localhost:4200
