@@ -8,16 +8,14 @@ import java.time.ZonedDateTime;
 @Data
 public class Payment {
 
-    private Long id;
+    private String reference;
     private BigDecimal amount;
     private String currency;
-
-    private BankAccount giverAccount;
+    private String originAccountNumber;
     private String beneficiaryAccountNumber;
     private String beneficiaryName;
     private String communication;
-
     private ZonedDateTime creationDate;
-
     private PaymentStatus status;
+
 }

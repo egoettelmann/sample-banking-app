@@ -8,7 +8,9 @@ import com.github.egoettelmann.sample.banking.api.core.dtos.AppUser;
 import com.github.egoettelmann.sample.banking.api.core.dtos.BankAccount;
 import com.github.egoettelmann.sample.banking.api.core.dtos.Payment;
 import com.github.egoettelmann.sample.banking.api.core.exceptions.DataNotFoundException;
+import com.github.egoettelmann.sample.banking.api.core.requests.PaymentFilter;
 import com.github.egoettelmann.sample.banking.api.core.requests.PaymentRequest;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.time.ZonedDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 class DefaultPaymentService implements PaymentService {
@@ -43,71 +46,53 @@ class DefaultPaymentService implements PaymentService {
     }
 
     @Override
-    public Page<Payment> getPaymentsForUser(AppUser user, Pageable pageable) {
-        return sqlPaymentRepositoryService.getPaymentsForUserId(user.getId(), pageable);
+    public Page<Payment> searchPayments(AppUser user, PaymentFilter filter, Pageable pageable) {
+        // TODO: add filtering for beneficiary accounts
+        // TODO: check which user is currently provided:
+        //  - admin: filter not mandatory
+        //  - user: filter mandatory
+        if (StringUtils.isBlank(filter.getOriginAccountNumber())) {
+            throw new DataNotFoundException("Specifying originAccountNumber for payments is mandatory");
+        }
+        // Checking user allowed to retrieve payments of account
+        final Optional<BankAccount> bankAccount = this.bankAccountService.getAccount(user, filter.getOriginAccountNumber());
+        if (!bankAccount.isPresent()) {
+            throw new DataNotFoundException("No bank account found for originAccountNumber " + filter.getOriginAccountNumber());
+        }
+
+        return sqlPaymentRepositoryService.findAll(filter, pageable);
     }
 
     @Transactional
     @Override
     public Payment createPayment(AppUser user, PaymentRequest paymentRequest) {
-        // Retrieving giver account
-        Optional<BankAccount> giverBankAccount = bankAccountService.getBankAccountForUserById(user, paymentRequest.getGiverAccountId());
+        // Retrieving origin account
+        final Optional<BankAccount> originAccount = bankAccountService.getAccount(user, paymentRequest.getOriginAccountNumber());
 
         // Checking that current user is authorized
-        if (!giverBankAccount.isPresent()) {
-            String message = String.format("BankAccount with id='%s' not found for userId='%s'", paymentRequest.getGiverAccountId(), user.getId());
-            throw new DataNotFoundException(message);
+        if (!originAccount.isPresent()) {
+            throw new DataNotFoundException("No bank account found for originAccountNumber " + paymentRequest.getOriginAccountNumber());
         }
+
+        // Validating payment request
+        paymentValidationService.checkPaymentCreation(user, paymentRequest);
 
         // Creating payment
         Payment payment = new Payment();
+        payment.setReference(UUID.randomUUID().toString());
         payment.setAmount(paymentRequest.getAmount());
         payment.setCurrency(paymentRequest.getCurrency());
-        payment.setGiverAccount(giverBankAccount.get());
+        payment.setOriginAccountNumber(paymentRequest.getOriginAccountNumber());
         payment.setBeneficiaryAccountNumber(paymentRequest.getBeneficiaryAccountNumber());
         payment.setBeneficiaryName(paymentRequest.getBeneficiaryName());
         payment.setCommunication(paymentRequest.getCommunication());
         payment.setCreationDate(ZonedDateTime.now());
 
-        // Differentiating between internal and external payment
-        Optional<BankAccount> beneficiaryBankAccount = bankAccountService.getBankAccountByAccountNumber(paymentRequest.getBeneficiaryAccountNumber());
-        if (beneficiaryBankAccount.isPresent()) {
-            paymentValidationService.validateInternalPayment(payment);
-            balanceService.subtractAmountFromBalance(payment.getAmount(), giverBankAccount.get());
-            balanceService.addAmountToBalance(payment.getAmount(), beneficiaryBankAccount.get());
-        } else {
-            paymentValidationService.validateExternalPayment(payment);
-            balanceService.subtractAmountFromBalance(payment.getAmount(), giverBankAccount.get());
-        }
+        // Registering transaction
+        balanceService.registerTransaction(user, originAccount.get().getNumber(), payment.getBeneficiaryAccountNumber(), payment.getAmount());
 
         // Saving
-        return sqlPaymentRepositoryService.savePayment(payment);
-    }
-
-    @Transactional
-    @Override
-    public void deletePayment(AppUser user, Long paymentId) {
-        // Retrieving the payment (and checking that it belongs to the user)
-        Payment payment = sqlPaymentRepositoryService.getPaymentForUserId(user.getId(), paymentId);
-        if (payment == null) {
-            String message = String.format("Payment with id='%s' not found for userId='%s'", paymentId, user.getId());
-            throw new DataNotFoundException(message);
-        }
-
-        // Validating that it can be deleted
-        paymentValidationService.validatePaymentDeletion(payment);
-
-        // Differentiating between internal and external payment
-        Optional<BankAccount> beneficiaryBankAccount = bankAccountService.getBankAccountByAccountNumber(payment.getBeneficiaryAccountNumber());
-        if (beneficiaryBankAccount.isPresent()) {
-            balanceService.addAmountToBalance(payment.getAmount(), payment.getGiverAccount());
-            balanceService.subtractAmountFromBalance(payment.getAmount(), beneficiaryBankAccount.get());
-        } else {
-            balanceService.addAmountToBalance(payment.getAmount(), payment.getGiverAccount());
-        }
-
-        // Saving
-        sqlPaymentRepositoryService.deletePayment(payment);
+        return sqlPaymentRepositoryService.save(payment);
     }
 
 }

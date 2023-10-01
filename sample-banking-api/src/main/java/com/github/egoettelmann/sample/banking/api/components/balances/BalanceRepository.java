@@ -1,16 +1,10 @@
 package com.github.egoettelmann.sample.banking.api.components.balances;
 
-import com.github.egoettelmann.sample.banking.api.core.dtos.BalanceStatus;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
 @Repository
-interface BalanceRepository extends CrudRepository<BalanceDbo, Long> {
-
-    List<BalanceDbo> findAllByAccountIdAndAccountUserId(Long accountId, Long userId);
-
-    BalanceDbo getByAccountIdAndStatus(Long accountId, BalanceStatus status);
+interface BalanceRepository extends CrudRepository<BalanceDbo, Long>, JpaSpecificationExecutor<BalanceDbo> {
 
 }

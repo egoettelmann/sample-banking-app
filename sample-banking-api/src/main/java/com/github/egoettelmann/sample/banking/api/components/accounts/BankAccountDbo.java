@@ -1,26 +1,29 @@
 package com.github.egoettelmann.sample.banking.api.components.accounts;
 
 import lombok.Data;
+import lombok.experimental.FieldNameConstants;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Data
+@FieldNameConstants
 @Entity
 @Table(name = "bank_account")
-public class BankAccountDbo {
+class BankAccountDbo {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "account_number")
-    private String accountNumber;
+    @Column(name = "number")
+    private String number;
 
-    @Column(name = "account_name")
-    private String accountName;
+    @Column(name = "name")
+    private String name;
+
+    @Column(name = "currency")
+    private String currency;
 
     @Column(name = "user_id")
     private Long userId;

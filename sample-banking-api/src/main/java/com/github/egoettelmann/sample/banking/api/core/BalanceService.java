@@ -2,19 +2,15 @@ package com.github.egoettelmann.sample.banking.api.core;
 
 import com.github.egoettelmann.sample.banking.api.core.dtos.AppUser;
 import com.github.egoettelmann.sample.banking.api.core.dtos.Balance;
-import com.github.egoettelmann.sample.banking.api.core.dtos.BankAccount;
+import com.github.egoettelmann.sample.banking.api.core.dtos.BalanceStatus;
 
 import java.math.BigDecimal;
-import java.util.List;
+import java.util.Optional;
 
 public interface BalanceService {
 
-    List<Balance> getBalancesForUserAndAccount(AppUser user, Long accountId);
+    Optional<Balance> getCurrentBalance(AppUser user, String accountNumber);
 
-    Balance getEndOfDayBalanceForAccount(Long accountId);
-
-    void addAmountToBalance(BigDecimal amount, BankAccount account);
-
-    void subtractAmountFromBalance(BigDecimal amount, BankAccount account);
+    void registerTransaction(AppUser user, String originAccountNumber, String beneficiaryAccountNumber, BigDecimal amount);
 
 }

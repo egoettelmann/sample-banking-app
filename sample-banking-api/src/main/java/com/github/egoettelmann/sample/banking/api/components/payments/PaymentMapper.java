@@ -1,14 +1,17 @@
 package com.github.egoettelmann.sample.banking.api.components.payments;
 
-import com.github.egoettelmann.sample.banking.api.components.accounts.BankAccountMapper;
 import com.github.egoettelmann.sample.banking.api.core.dtos.Payment;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.ReportingPolicy;
 
-@Mapper(componentModel = "spring", uses = {BankAccountMapper.class})
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.ERROR)
 interface PaymentMapper {
 
     Payment to(PaymentDbo dbo);
 
-    PaymentDbo from(Payment dto);
+    @Mapping(target = "id", ignore = true)
+    PaymentDbo from(Payment dto, @MappingTarget PaymentDbo dbo);
 
 }

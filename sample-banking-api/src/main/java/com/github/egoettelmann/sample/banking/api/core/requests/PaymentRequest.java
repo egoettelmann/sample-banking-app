@@ -13,7 +13,7 @@ public class PaymentRequest {
     private String currency;
 
     @NotNull
-    private Long giverAccountId;
+    private String originAccountNumber;
 
     @NotNull
     private String beneficiaryAccountNumber;

@@ -3,6 +3,7 @@ package com.github.egoettelmann.sample.banking.api.controllers;
 import com.github.egoettelmann.sample.banking.api.core.PaymentService;
 import com.github.egoettelmann.sample.banking.api.core.dtos.AppUser;
 import com.github.egoettelmann.sample.banking.api.core.dtos.Payment;
+import com.github.egoettelmann.sample.banking.api.core.requests.PaymentFilter;
 import com.github.egoettelmann.sample.banking.api.core.requests.PaymentRequest;
 import org.springdoc.core.converters.PageableAsQueryParam;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,9 +29,10 @@ public class PaymentController {
     @GetMapping
     @PageableAsQueryParam
     public Page<Payment> findAllPayments(
+            PaymentFilter filter,
             @PageableDefault(sort = "creationDate", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        return paymentService.getPaymentsForUser(AppUser.current(), pageable);
+        return paymentService.searchPayments(AppUser.current(), filter, pageable);
     }
 
     @PostMapping
@@ -38,11 +40,6 @@ public class PaymentController {
             @Valid @RequestBody PaymentRequest paymentRequest
     ) {
         return paymentService.createPayment(AppUser.current(), paymentRequest);
-    }
-
-    @DeleteMapping("/{paymentId}")
-    public void deletePayment(@PathVariable("paymentId") Long paymentId) {
-        paymentService.deletePayment(AppUser.current(), paymentId);
     }
 
 }

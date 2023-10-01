@@ -42,11 +42,11 @@ The same token can be used on the authentication API to update the user info.
 
 Following accounts are configured to create and delete payments:
  - `user1@test.com`:
-   - 'LU510011111111111111', with an initial balance of `1,000.00 EUR`
-   - 'LU090012222222222222', with an initial balance of `0.00 EUR`
+   - `LU510011111111111111`, with an initial balance of `1,000.00 EUR`
+   - `LU090012222222222222`, with an initial balance of `0.00 EUR`
  - `user2@test.com`
-   - 'LU640013333333333333', with an initial balance of `1,000.00 EUR`
-   - 'LU220014444444444444', with an initial balance of `0.00 EUR`
+   - `LU640013333333333333`, with an initial balance of `1,000.00 EUR`
+   - `LU220014444444444444`, with an initial balance of `0.00 EUR`
 
 ## End-2-end tests
 

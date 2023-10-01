@@ -1,10 +1,17 @@
 package com.github.egoettelmann.sample.banking.api.components.payments;
 
 import com.github.egoettelmann.sample.banking.api.core.dtos.Payment;
+import com.github.egoettelmann.sample.banking.api.core.requests.PaymentFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+
+import javax.persistence.criteria.Predicate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 class SqlPaymentRepositoryService {
@@ -22,24 +29,59 @@ class SqlPaymentRepositoryService {
         this.paymentMapper = paymentMapper;
     }
 
-    public Page<Payment> getPaymentsForUserId(Long userId, Pageable pageable) {
-        return paymentRepository.findAllByGiverAccountId(userId, pageable).map(paymentMapper::to);
+    public Page<Payment> findAll(PaymentFilter filter, Pageable pageable) {
+        return paymentRepository.findAll(
+                paymentSpecification(filter),
+                pageable
+        ).map(paymentMapper::to);
     }
 
-    public Payment getPaymentForUserId(Long userId, Long paymentId) {
-        return paymentMapper.to(
-                paymentRepository.findByIdAndGiverAccountUserId(paymentId, userId)
+    public Optional<Payment> findOne(PaymentFilter filter) {
+        return paymentRepository.findOne(
+                paymentSpecification(filter)
+        ).map(paymentMapper::to);
+    }
+
+    public Payment save(Payment payment) {
+        final PaymentFilter filter = PaymentFilter.builder()
+                .reference(payment.getReference())
+                .originAccountNumber(payment.getOriginAccountNumber())
+                .build();
+        final Optional<PaymentDbo> existing = paymentRepository.findOne(
+                paymentSpecification(filter)
         );
-    }
-
-    public Payment savePayment(Payment payment) {
-        PaymentDbo dbo = paymentRepository.save(
-                paymentMapper.from(payment)
+        PaymentDbo dbo = existing.orElse(new PaymentDbo());
+        dbo = paymentRepository.save(
+                paymentMapper.from(payment, dbo)
         );
         return paymentMapper.to(dbo);
     }
 
-    public void deletePayment(Payment payment) {
-        paymentRepository.deleteById(payment.getId());
+    private Specification<PaymentDbo> paymentSpecification(PaymentFilter filter) {
+        return (root, criteriaQuery, criteriaBuilder) -> {
+            final List<Predicate> predicates = new ArrayList<>();
+
+            // Reference
+            if (filter.getReference() != null) {
+                predicates.add(
+                        criteriaBuilder.equal(
+                                root.get(PaymentDbo.Fields.reference),
+                                filter.getReference()
+                        )
+                );
+            }
+
+            // Origin Account Number
+            if (filter.getOriginAccountNumber() != null) {
+                predicates.add(
+                        criteriaBuilder.equal(
+                                root.get(PaymentDbo.Fields.originAccountNumber),
+                                filter.getOriginAccountNumber()
+                        )
+                );
+            }
+
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        };
     }
 }

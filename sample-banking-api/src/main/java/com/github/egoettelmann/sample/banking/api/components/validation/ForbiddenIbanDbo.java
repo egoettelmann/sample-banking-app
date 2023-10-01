@@ -10,7 +10,7 @@ import javax.persistence.Table;
 @Data
 @Entity
 @Table(name = "forbidden_iban")
-public class ForbiddenIbanDbo {
+class ForbiddenIbanDbo {
 
     @Id
     @Column(name = "id")

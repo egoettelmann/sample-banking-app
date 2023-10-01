@@ -1,69 +1,95 @@
 package com.github.egoettelmann.sample.banking.api.components.balances;
 
 import com.github.egoettelmann.sample.banking.api.core.BalanceService;
+import com.github.egoettelmann.sample.banking.api.core.BankAccountService;
 import com.github.egoettelmann.sample.banking.api.core.dtos.AppUser;
 import com.github.egoettelmann.sample.banking.api.core.dtos.Balance;
 import com.github.egoettelmann.sample.banking.api.core.dtos.BalanceStatus;
 import com.github.egoettelmann.sample.banking.api.core.dtos.BankAccount;
+import com.github.egoettelmann.sample.banking.api.core.exceptions.DataNotFoundException;
+import com.github.egoettelmann.sample.banking.api.core.requests.BalanceFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.List;
+import java.time.LocalDate;
+import java.util.Optional;
 
 @Service
 class DefaultBalanceService implements BalanceService {
 
+    private final BankAccountService bankAccountService;
+
     private final SqlBalanceRepositoryService sqlBalanceRepositoryService;
 
     @Autowired
-    public DefaultBalanceService(SqlBalanceRepositoryService sqlBalanceRepositoryService) {
+    public DefaultBalanceService(
+            BankAccountService bankAccountService,
+            SqlBalanceRepositoryService sqlBalanceRepositoryService
+    ) {
+        this.bankAccountService = bankAccountService;
         this.sqlBalanceRepositoryService = sqlBalanceRepositoryService;
     }
 
     @Override
-    public List<Balance> getBalancesForUserAndAccount(AppUser user, Long accountId) {
-        return sqlBalanceRepositoryService.getBalancesForUserIdAndAccountId(user.getId(), accountId);
-    }
-
-    @Override
-    public Balance getEndOfDayBalanceForAccount(Long accountId) {
-        // Get the end of day balance if it exists
-        Balance endOfDay = sqlBalanceRepositoryService.getBalanceForAccountIdAndStatus(accountId, BalanceStatus.END_OF_DAY);
-        if (endOfDay != null) {
-            return endOfDay;
+    public Optional<Balance> getCurrentBalance(AppUser user, String accountNumber) {
+        // Checking user allowed to retrieve balance of account
+        final Optional<BankAccount> bankAccount = this.bankAccountService.getAccount(user, accountNumber);
+        if (!bankAccount.isPresent()) {
+            return Optional.empty();
         }
 
-        // Otherwise we build a new one from the available balance
-        Balance availableBalance = sqlBalanceRepositoryService.getBalanceForAccountIdAndStatus(accountId, BalanceStatus.AVAILABLE);
-        return buildEndOfDayBalance(availableBalance);
+        final BalanceFilter filter = BalanceFilter.builder()
+                .accountNumber(accountNumber)
+                .build();
+        return sqlBalanceRepositoryService.findOne(filter);
     }
 
     @Override
-    public void addAmountToBalance(BigDecimal amount, BankAccount account) {
-        // Retrieving the 'end_of_day' balance of the giver and updating amount
-        Balance balance = getEndOfDayBalanceForAccount(account.getId());
-        BigDecimal newGiverBalance = balance.getAmount().add(amount);
-        balance.setAmount(newGiverBalance);
-        sqlBalanceRepositoryService.save(balance);
+    public void registerTransaction(AppUser user, String originAccountNumber, String beneficiaryAccountNumber, BigDecimal amount) {
+        // Checking user allowed to register transaction on account
+        final Optional<BankAccount> originBankAccount = this.bankAccountService.getAccount(user, originAccountNumber);
+        if (!originBankAccount.isPresent()) {
+            throw new DataNotFoundException("No bank account found with number " + originAccountNumber);
+        }
+
+        // Removing from origin account
+        final Balance originBalance = getProvisionalBalance(originAccountNumber);
+        originBalance.setValue(originBalance.getValue().subtract(amount));
+        sqlBalanceRepositoryService.save(originBalance);
+
+        // Adding to beneficiary account if it exists
+        // TODO: use technical account to retrieve beneficiary account
+        final Optional<BankAccount> beneficiaryAccount = this.bankAccountService.getAccount(user, beneficiaryAccountNumber);
+        if (!beneficiaryAccount.isPresent()) {
+            return;
+        }
+        final Balance beneficiaryBalance = getProvisionalBalance(beneficiaryAccountNumber);
+        beneficiaryBalance.setValue(beneficiaryBalance.getValue().add(amount));
+        sqlBalanceRepositoryService.save(beneficiaryBalance);
     }
 
-    @Override
-    public void subtractAmountFromBalance(BigDecimal amount, BankAccount account) {
-        // Retrieving the 'end_of_day' balance of the giver and updating amount
-        Balance balance = getEndOfDayBalanceForAccount(account.getId());
-        BigDecimal newGiverBalance = balance.getAmount().subtract(amount);
-        balance.setAmount(newGiverBalance);
-        sqlBalanceRepositoryService.save(balance);
-    }
+    private Balance getProvisionalBalance(String accountNumber) {
+        final BalanceFilter filter = BalanceFilter.builder()
+                .accountNumber(accountNumber)
+                .build();
+        final Optional<Balance> balance = sqlBalanceRepositoryService.findOne(filter);
+        if (!balance.isPresent()) {
+            throw new DataNotFoundException("No balance found for account " + accountNumber);
+        }
 
-    private Balance buildEndOfDayBalance(Balance availableBalance) {
-        Balance balance = new Balance();
-        balance.setAmount(availableBalance.getAmount());
-        balance.setCurrency(availableBalance.getCurrency());
-        balance.setAccount(availableBalance.getAccount());
-        balance.setStatus(BalanceStatus.END_OF_DAY);
-        return balance;
+        // If PROVISIONAL balance already exists for date, returning it
+        if (BalanceStatus.PROVISIONAL.equals(balance.get().getStatus())) {
+            return balance.get();
+        }
+
+        // Retrieving the latest VALIDATED balance and creating PROVISIONAL out of it
+        final Balance provisionalBalance = new Balance();
+        provisionalBalance.setAccountNumber(accountNumber);
+        provisionalBalance.setValueDate(LocalDate.now());
+        provisionalBalance.setStatus(BalanceStatus.PROVISIONAL);
+        provisionalBalance.setValue(balance.get().getValue());
+        return provisionalBalance;
     }
 
 }

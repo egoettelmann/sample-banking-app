@@ -1,31 +1,32 @@
 package com.github.egoettelmann.sample.banking.api.components.balances;
 
-import com.github.egoettelmann.sample.banking.api.components.accounts.BankAccountDbo;
 import com.github.egoettelmann.sample.banking.api.core.dtos.BalanceStatus;
 import lombok.Data;
+import lombok.experimental.FieldNameConstants;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Data
+@FieldNameConstants
 @Entity
 @Table(name = "balance")
-public class BalanceDbo {
+class BalanceDbo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "amount")
-    private BigDecimal amount;
+    @Column(name = "account_number")
+    private String accountNumber;
 
-    @Column(name = "currency")
-    private String currency;
+    @Column(name = "value")
+    private BigDecimal value;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "account_id")
-    private BankAccountDbo account;
+    @Column(name = "valueDate")
+    private LocalDate valueDate;
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)

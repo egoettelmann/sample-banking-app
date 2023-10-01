@@ -8,6 +8,7 @@ import com.github.egoettelmann.sample.banking.api.core.dtos.BalanceStatus;
 import com.github.egoettelmann.sample.banking.api.core.dtos.Payment;
 import com.github.egoettelmann.sample.banking.api.core.exceptions.DataNotFoundException;
 import com.github.egoettelmann.sample.banking.api.core.exceptions.payment.InvalidIbanException;
+import com.github.egoettelmann.sample.banking.api.core.requests.PaymentFilter;
 import com.github.egoettelmann.sample.banking.api.core.requests.PaymentRequest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -19,12 +20,13 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.Optional;
 
 @SpringBootTest
+@ActiveProfiles("test")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class CreatePaymentServiceTest {
 
@@ -40,27 +42,33 @@ public class CreatePaymentServiceTest {
     @Test
     public void whenRetrievingPayments_sizeShouldMatch() {
         AppUser appUser = buildUser(1L);
-        Page<Payment> payments = paymentService.getPaymentsForUser(appUser, Pageable.unpaged());
+        final PaymentFilter filter = PaymentFilter.builder()
+                .originAccountNumber("LU510011111111111111")
+                .build();
+        Page<Payment> payments = paymentService.searchPayments(appUser, filter, Pageable.unpaged());
 
         Assertions.assertEquals(1, payments.getTotalElements(), "Wrong number of payments");
     }
 
     @Test
-    public void whenCreateValidPayment_idShouldNotBeNullAndSizeShouldMatch() {
+    public void whenCreateValidPayment_referenceShouldNotBeNullAndSizeShouldMatch() {
         AppUser appUser = buildUser(1L);
 
         PaymentRequest paymentRequest = new PaymentRequest();
         paymentRequest.setAmount(BigDecimal.valueOf(834.56));
         paymentRequest.setCurrency("EUR");
-        paymentRequest.setGiverAccountId(1L);
+        paymentRequest.setOriginAccountNumber("LU510011111111111111");
         paymentRequest.setBeneficiaryAccountNumber("LU090012222222222222");
         paymentRequest.setBeneficiaryName("Test Beneficiary");
 
         Payment payment = paymentService.createPayment(appUser, paymentRequest);
 
-        Assertions.assertNotNull(payment.getId(), "Payment id should not be null");
+        Assertions.assertNotNull(payment.getReference(), "Payment reference should not be null");
 
-        Page<Payment> payments = paymentService.getPaymentsForUser(appUser, Pageable.unpaged());
+        final PaymentFilter filter = PaymentFilter.builder()
+                .originAccountNumber("LU510011111111111111")
+                .build();
+        Page<Payment> payments = paymentService.searchPayments(appUser, filter, Pageable.unpaged());
         Assertions.assertEquals(2, payments.getTotalElements(), "Wrong number of payments");
     }
 
@@ -71,7 +79,7 @@ public class CreatePaymentServiceTest {
         PaymentRequest paymentRequest = new PaymentRequest();
         paymentRequest.setAmount(BigDecimal.valueOf(834.56));
         paymentRequest.setCurrency("EUR");
-        paymentRequest.setGiverAccountId(1L);
+        paymentRequest.setOriginAccountNumber("LU510011111111111111");
         paymentRequest.setBeneficiaryAccountNumber("LU090012222222222222");
         paymentRequest.setBeneficiaryName("Test Beneficiary");
 
@@ -87,7 +95,7 @@ public class CreatePaymentServiceTest {
         PaymentRequest paymentRequest = new PaymentRequest();
         paymentRequest.setAmount(BigDecimal.valueOf(800.00));
         paymentRequest.setCurrency("EUR");
-        paymentRequest.setGiverAccountId(1L);
+        paymentRequest.setOriginAccountNumber("LU510011111111111111");
         paymentRequest.setBeneficiaryAccountNumber("LU090012222222222222");
         paymentRequest.setBeneficiaryName("Test Beneficiary");
 
@@ -95,17 +103,10 @@ public class CreatePaymentServiceTest {
             Payment payment = paymentService.createPayment(appUser, paymentRequest);
         });
 
-        List<Balance> balances = balanceService.getBalancesForUserAndAccount(appUser, 1L);
-        Assertions.assertEquals(2, balances.size(), "Wrong size of balances");
-        Optional<Balance> availableBalance = balances.stream()
-                .filter(b -> BalanceStatus.AVAILABLE.equals(b.getStatus()))
-                .findFirst();
-        Assertions.assertTrue(availableBalance.isPresent(), "No available balance found");
-        Optional<Balance> endOfDayBalance = balances.stream()
-                .filter(b -> BalanceStatus.END_OF_DAY.equals(b.getStatus()))
-                .findFirst();
-        Assertions.assertTrue(endOfDayBalance.isPresent(), "No endOfDay balance found");
-        Assertions.assertEquals(0, BigDecimal.valueOf(200.00).compareTo(endOfDayBalance.get().getAmount()), "Wrong endOfDay balance amount");
+        Optional<Balance> balance = balanceService.getCurrentBalance(appUser, "LU510011111111111111");
+        Assertions.assertTrue(balance.isPresent(), "No current balance found");
+        Assertions.assertEquals(BalanceStatus.PROVISIONAL, balance.get().getStatus(), "Wrong balance status");
+        Assertions.assertEquals(0, BigDecimal.valueOf(200.00).compareTo(balance.get().getValue()), "Wrong current balance amount");
     }
 
     @Test
@@ -115,7 +116,7 @@ public class CreatePaymentServiceTest {
         PaymentRequest paymentRequest = new PaymentRequest();
         paymentRequest.setAmount(BigDecimal.valueOf(70.00));
         paymentRequest.setCurrency("EUR");
-        paymentRequest.setGiverAccountId(1L);
+        paymentRequest.setOriginAccountNumber("LU510011111111111111");
         paymentRequest.setBeneficiaryAccountNumber("LU640013333333333333");
         paymentRequest.setBeneficiaryName("Test Beneficiary");
 
@@ -123,31 +124,17 @@ public class CreatePaymentServiceTest {
             Payment payment = paymentService.createPayment(appUser, paymentRequest);
         });
 
-        List<Balance> balances = balanceService.getBalancesForUserAndAccount(appUser, 1L);
-        Assertions.assertEquals(2, balances.size(), "Wrong size of balances");
-        Optional<Balance> availableBalance = balances.stream()
-                .filter(b -> BalanceStatus.AVAILABLE.equals(b.getStatus()))
-                .findFirst();
-        Assertions.assertTrue(availableBalance.isPresent(), "No available balance found");
-        Optional<Balance> endOfDayBalance = balances.stream()
-                .filter(b -> BalanceStatus.END_OF_DAY.equals(b.getStatus()))
-                .findFirst();
-        Assertions.assertTrue(endOfDayBalance.isPresent(), "No endOfDay balance found");
-        Assertions.assertEquals(0, BigDecimal.valueOf(930.00).compareTo(endOfDayBalance.get().getAmount()), "Wrong endOfDay balance amount");
+        Optional<Balance> balance1 = balanceService.getCurrentBalance(appUser, "LU510011111111111111");
+        Assertions.assertTrue(balance1.isPresent(), "No current balance found");
+        Assertions.assertEquals(BalanceStatus.PROVISIONAL, balance1.get().getStatus(), "Wrong balance status");
+        Assertions.assertEquals(0, BigDecimal.valueOf(930).compareTo(balance1.get().getValue()), "Wrong current balance amount");
 
         AppUser beneficiary = buildUser(2L);
-        List<Balance> beneficiaryBalances = balanceService.getBalancesForUserAndAccount(beneficiary, 3L);
 
-        Assertions.assertEquals(2, beneficiaryBalances.size(), "Wrong size of beneficiary balances");
-        Optional<Balance> availableBeneficiaryBalance = beneficiaryBalances.stream()
-                .filter(b -> BalanceStatus.AVAILABLE.equals(b.getStatus()))
-                .findFirst();
-        Assertions.assertTrue(availableBeneficiaryBalance.isPresent(), "No available beneficiary balance found");
-        Optional<Balance> endOfDayBeneficiaryBalance = beneficiaryBalances.stream()
-                .filter(b -> BalanceStatus.END_OF_DAY.equals(b.getStatus()))
-                .findFirst();
-        Assertions.assertTrue(endOfDayBeneficiaryBalance.isPresent(), "No endOfDay beneficiary balance found");
-        Assertions.assertEquals(0, BigDecimal.valueOf(1070).compareTo(endOfDayBeneficiaryBalance.get().getAmount()), "Wrong endOfDay beneficiary balance amount");
+        Optional<Balance> balance2 = balanceService.getCurrentBalance(beneficiary, "LU640013333333333333");
+        Assertions.assertTrue(balance2.isPresent(), "No current balance found");
+        Assertions.assertEquals(BalanceStatus.PROVISIONAL, balance2.get().getStatus(), "Wrong balance status");
+        Assertions.assertEquals(0, BigDecimal.valueOf(1070).compareTo(balance1.get().getValue()), "Wrong current balance amount");
     }
 
     @Test
@@ -157,22 +144,26 @@ public class CreatePaymentServiceTest {
         PaymentRequest paymentRequest = new PaymentRequest();
         paymentRequest.setAmount(BigDecimal.valueOf(300.00));
         paymentRequest.setCurrency("EUR");
-        paymentRequest.setGiverAccountId(1L);
+        paymentRequest.setOriginAccountNumber("LU510011111111111111");
         paymentRequest.setBeneficiaryAccountNumber("LU640013333333333333");
         paymentRequest.setBeneficiaryName("Test Beneficiary");
 
-        Mockito.doThrow(new DataIntegrityViolationException("Save failed")).when(sqlPaymentRepositoryService).savePayment(Mockito.any());
+        Mockito.doThrow(new DataIntegrityViolationException("Save failed")).when(sqlPaymentRepositoryService).save(Mockito.any());
         Assertions.assertThrows(DataIntegrityViolationException.class, () -> {
             Payment payment = paymentService.createPayment(appUser, paymentRequest);
         });
 
-        List<Balance> balances = balanceService.getBalancesForUserAndAccount(appUser, 1L);
-        Assertions.assertEquals(1, balances.size(), "Wrong size of balances");
+        Optional<Balance> balance1 = balanceService.getCurrentBalance(appUser, "LU510011111111111111");
+        Assertions.assertTrue(balance1.isPresent(), "No current balance found");
+        Assertions.assertEquals(BalanceStatus.PROVISIONAL, balance1.get().getStatus(), "Wrong balance status");
+        Assertions.assertEquals(0, BigDecimal.valueOf(1000).compareTo(balance1.get().getValue()), "Wrong current balance amount");
 
         AppUser beneficiary = buildUser(2L);
-        List<Balance> beneficiaryBalances = balanceService.getBalancesForUserAndAccount(beneficiary, 3L);
 
-        Assertions.assertEquals(1, beneficiaryBalances.size(), "Wrong size of beneficiary balances");
+        Optional<Balance> balance2 = balanceService.getCurrentBalance(beneficiary, "LU640013333333333333");
+        Assertions.assertTrue(balance2.isPresent(), "No current balance found");
+        Assertions.assertEquals(BalanceStatus.PROVISIONAL, balance2.get().getStatus(), "Wrong balance status");
+        Assertions.assertEquals(0, BigDecimal.valueOf(1000).compareTo(balance1.get().getValue()), "Wrong current balance amount");
     }
 
     @Test
@@ -182,7 +173,7 @@ public class CreatePaymentServiceTest {
         PaymentRequest paymentRequest = new PaymentRequest();
         paymentRequest.setAmount(BigDecimal.valueOf(834.56));
         paymentRequest.setCurrency("EUR");
-        paymentRequest.setGiverAccountId(1L);
+        paymentRequest.setOriginAccountNumber("LU510011111111111111");
         paymentRequest.setBeneficiaryAccountNumber("INVALID_IBAN");
         paymentRequest.setBeneficiaryName("Test Beneficiary");
 

@@ -1,13 +1,10 @@
 package com.github.egoettelmann.sample.banking.api.core;
 
-import com.github.egoettelmann.sample.banking.api.core.dtos.Payment;
+import com.github.egoettelmann.sample.banking.api.core.dtos.AppUser;
+import com.github.egoettelmann.sample.banking.api.core.requests.PaymentRequest;
 
 public interface PaymentValidationService {
 
-    void validateInternalPayment(Payment payment);
-
-    void validateExternalPayment(Payment payment);
-
-    void validatePaymentDeletion(Payment payment);
+    void checkPaymentCreation(AppUser user, PaymentRequest paymentRequest);
 
 }

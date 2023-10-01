@@ -3,15 +3,14 @@ package com.github.egoettelmann.sample.banking.api.core.dtos;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Data
 public class Balance {
 
-    private Long id;
-    private BigDecimal amount;
-    private String currency;
-
-    private BankAccount account;
-
+    private String accountNumber;
+    private BigDecimal value;
+    private LocalDate valueDate;
     private BalanceStatus status;
+
 }

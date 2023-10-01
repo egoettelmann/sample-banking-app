@@ -1,22 +1,26 @@
 package com.github.egoettelmann.sample.banking.api.components.payments;
 
-import com.github.egoettelmann.sample.banking.api.components.accounts.BankAccountDbo;
 import com.github.egoettelmann.sample.banking.api.core.dtos.PaymentStatus;
 import lombok.Data;
+import lombok.experimental.FieldNameConstants;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 
 @Data
+@FieldNameConstants
 @Entity
 @Table(name = "payment")
-public class PaymentDbo {
+class PaymentDbo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
+
+    @Column(name = "reference")
+    private String reference;
 
     @Column(name = "amount")
     private BigDecimal amount;
@@ -24,9 +28,8 @@ public class PaymentDbo {
     @Column(name = "currency")
     private String currency;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "giver_account_id")
-    private BankAccountDbo giverAccount;
+    @Column(name = "origin_account_number")
+    private String originAccountNumber;
 
     @Column(name = "beneficiary_account_number")
     private String beneficiaryAccountNumber;
