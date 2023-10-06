@@ -38,23 +38,18 @@ public class NoAuthSecurityConfig {
             @Override
             protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
                 // Extracting username from headers
-                long userId = 1L;
-                String headerValue = request.getHeader("userId");
+                String username = "user1@test.com";
+                String headerValue = request.getHeader("username");
                 if (headerValue != null) {
-                    try {
-                        userId = Long.parseLong(headerValue);
-                    } catch (Exception e) {
-                        log.error("Impossible to extract 'userId' from headers: ", e);
-                        chain.doFilter(request, response);
-                        return;
-                    }
+                    username = headerValue;
                 }
 
                 // Building the user details
-                AppUser user = new AppUser();
-                user.setId(userId);
-                user.setUsername("no-auth");
-                Authentication authentication = new UsernamePasswordAuthenticationToken(user, "", Collections.emptyList());
+                AppUser user = new AppUser(
+                        username,
+                        Collections.emptySet()
+                );
+                Authentication authentication = new UsernamePasswordAuthenticationToken(user, "", user.getAuthorities());
 
                 // Defining the security context
                 SecurityContextHolder.getContext().setAuthentication(authentication);

@@ -5,7 +5,7 @@ import com.github.egoettelmann.sample.banking.api.core.dtos.AppUser;
 import com.github.egoettelmann.sample.banking.api.core.dtos.Payment;
 import com.github.egoettelmann.sample.banking.api.core.requests.PaymentFilter;
 import com.github.egoettelmann.sample.banking.api.core.requests.PaymentRequest;
-import org.springdoc.core.converters.PageableAsQueryParam;
+import org.springdoc.core.converters.models.PageableAsQueryParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

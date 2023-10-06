@@ -17,12 +17,12 @@ describe('User info', async () => {
                 if (err) done(err)
                 res.should.have.status(200);
                 res.body.should.be.a("object");
-                res.body.should.have.property("id");
-                expect(res.body.id).to.equal(1);
                 res.body.should.have.property("username");
                 expect(res.body.username).to.equal('user1@test.com');
                 res.body.should.have.property("address");
                 expect(res.body.address).to.equal('');
+                res.body.should.have.property("claims");
+                expect(res.body.claims).to.have.members(['CUSTOMER']);
                 done();
             });
     });
@@ -48,12 +48,12 @@ describe('User info', async () => {
                 if (err) done(err)
                 res.should.have.status(200);
                 res.body.should.be.a("object");
-                res.body.should.have.property("id");
-                expect(res.body.id).to.equal(1);
                 res.body.should.have.property("username");
                 expect(res.body.username).to.equal('user1@test.com');
                 res.body.should.have.property("address");
                 expect(res.body.address).to.equal('My new address');
+                res.body.should.have.property("claims");
+                expect(res.body.claims).to.have.members(['CUSTOMER']);
                 done();
             });
     });
@@ -66,12 +66,12 @@ describe('User info', async () => {
                 if (err) done(err)
                 res.should.have.status(200);
                 res.body.should.be.a("object");
-                res.body.should.have.property("id");
-                expect(res.body.id).to.equal(1);
                 res.body.should.have.property("username");
                 expect(res.body.username).to.equal('user1@test.com');
                 res.body.should.have.property("address");
                 expect(res.body.address).to.equal('My new address');
+                res.body.should.have.property("claims");
+                expect(res.body.claims).to.have.members(['CUSTOMER']);
                 done();
             });
     });

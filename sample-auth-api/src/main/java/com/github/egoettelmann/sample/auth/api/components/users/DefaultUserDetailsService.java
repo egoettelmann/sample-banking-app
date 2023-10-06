@@ -10,6 +10,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 class DefaultUserDetailsService implements UserDetailsService, UserInfoService {
 
@@ -24,28 +26,32 @@ class DefaultUserDetailsService implements UserDetailsService, UserInfoService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = sqlUserRepositoryService.getUserByUsername(username);
-        if (user == null) {
+        final Optional<User> user = sqlUserRepositoryService.getUser(username);
+        if (!user.isPresent()) {
             throw new UsernameNotFoundException("No user found with username: " + username);
         }
-        return new AppUserDetails(
-                user.getId(),
-                user.getUsername(),
-                user.getPassword()
-        );
+        return user.map(u -> new AppUserDetails(
+                u.getUsername(),
+                u.getPassword(),
+                u.getClaims()
+        )).get();
     }
 
     @Override
-    public User getUserInfo(AppUserDetails appUser) {
-        return sqlUserRepositoryService.getUserById(appUser.getUserId());
+    public Optional<User> getUserInfo(AppUserDetails appUser) {
+        return sqlUserRepositoryService.getUser(appUser.getUsername());
     }
 
     @Override
     public User updateUserInfo(AppUserDetails appUser, UserRequest userRequest) {
-        User user = sqlUserRepositoryService.getUserById(appUser.getUserId());
-        user.setPassword(userRequest.getPassword());
+        final Optional<User> existing = sqlUserRepositoryService.getUser(appUser.getUsername());
+        if (!existing.isPresent()) {
+            throw new UsernameNotFoundException("No user found with username: " + appUser.getUsername());
+        }
+        final User user = existing.get();
+        user.setPassword(userRequest.getPassword()); // TODO: encode
         user.setAddress(userRequest.getAddress());
-        return sqlUserRepositoryService.updateUser(user);
+        return sqlUserRepositoryService.save(user);
     }
 
 }

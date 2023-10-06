@@ -7,6 +7,7 @@ import com.github.egoettelmann.sample.banking.api.core.PaymentValidationService;
 import com.github.egoettelmann.sample.banking.api.core.dtos.AppUser;
 import com.github.egoettelmann.sample.banking.api.core.dtos.BankAccount;
 import com.github.egoettelmann.sample.banking.api.core.dtos.Payment;
+import com.github.egoettelmann.sample.banking.api.core.dtos.PaymentStatus;
 import com.github.egoettelmann.sample.banking.api.core.exceptions.DataNotFoundException;
 import com.github.egoettelmann.sample.banking.api.core.requests.PaymentFilter;
 import com.github.egoettelmann.sample.banking.api.core.requests.PaymentRequest;
@@ -47,10 +48,6 @@ class DefaultPaymentService implements PaymentService {
 
     @Override
     public Page<Payment> searchPayments(AppUser user, PaymentFilter filter, Pageable pageable) {
-        // TODO: add filtering for beneficiary accounts
-        // TODO: check which user is currently provided:
-        //  - admin: filter not mandatory
-        //  - user: filter mandatory
         if (StringUtils.isBlank(filter.getOriginAccountNumber())) {
             throw new DataNotFoundException("Specifying originAccountNumber for payments is mandatory");
         }
@@ -87,6 +84,7 @@ class DefaultPaymentService implements PaymentService {
         payment.setBeneficiaryName(paymentRequest.getBeneficiaryName());
         payment.setCommunication(paymentRequest.getCommunication());
         payment.setCreationDate(ZonedDateTime.now());
+        payment.setStatus(PaymentStatus.ACCEPTED);
 
         // Registering transaction
         balanceService.registerTransaction(user, originAccount.get().getNumber(), payment.getBeneficiaryAccountNumber(), payment.getAmount());

@@ -6,7 +6,7 @@ const app = require('../app')
 describe("Balances without auth headers", () => {
     it("should not be accessible", done => {
         app.bankingApi
-            .get("/balances")
+            .get("/balances/LU510011111111111111/current")
             .end((err, res) => {
                 if (err) done(err)
                 res.should.have.status(401);
@@ -26,36 +26,36 @@ describe('Balances for user 1', async () => {
 
     it("should get one for account 1", done => {
         app.bankingApi
-            .get("/balances/1")
+            .get("/balances/LU510011111111111111/current")
             .set(authHeaders)
             .end((err, res) => {
                 if (err) done(err)
                 res.should.have.status(200);
-                res.body.should.be.a("array");
-                expect(res.body.length).to.equal(1);
-                res.body[0].should.have.property("account");
-                res.body[0].account.should.have.property("accountNumber");
-                expect(res.body[0].account.accountNumber).to.equal("LU510011111111111111");
-                res.body[0].should.have.property("amount");
-                expect(res.body[0].amount).to.equal(1000);
+                res.body.should.be.a("object");
+                res.body.should.have.property("accountNumber");
+                expect(res.body.accountNumber).to.equal("LU510011111111111111");
+                res.body.should.have.property("value");
+                expect(res.body.value).to.equal(1000);
+                res.body.should.have.property("status");
+                expect(res.body.status).to.equal("VALIDATED");
                 done();
             });
     });
 
     it("should get one for account 2", done => {
         app.bankingApi
-            .get("/balances/2")
+            .get("/balances/LU090012222222222222/current")
             .set(authHeaders)
             .end((err, res) => {
                 if (err) done(err)
                 res.should.have.status(200);
-                res.body.should.be.a("array");
-                expect(res.body.length).to.equal(1);
-                res.body[0].should.have.property("account");
-                res.body[0].account.should.have.property("accountNumber");
-                expect(res.body[0].account.accountNumber).to.equal("LU090012222222222222");
-                res.body[0].should.have.property("amount");
-                expect(res.body[0].amount).to.equal(0);
+                res.body.should.be.a("object");
+                res.body.should.have.property("accountNumber");
+                expect(res.body.accountNumber).to.equal("LU090012222222222222");
+                res.body.should.have.property("value");
+                expect(res.body.value).to.equal(0);
+                res.body.should.have.property("status");
+                expect(res.body.status).to.equal("VALIDATED");
                 done();
             });
     });

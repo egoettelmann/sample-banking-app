@@ -1,6 +1,7 @@
 package com.github.egoettelmann.sample.banking.api.components.accounts;
 
 import com.github.egoettelmann.sample.banking.api.core.BankAccountService;
+import com.github.egoettelmann.sample.banking.api.core.dtos.AppAuthority;
 import com.github.egoettelmann.sample.banking.api.core.dtos.AppUser;
 import com.github.egoettelmann.sample.banking.api.core.dtos.BankAccount;
 import com.github.egoettelmann.sample.banking.api.core.requests.BankAccountFilter;
@@ -23,22 +24,22 @@ class DefaultBankAccountService implements BankAccountService {
 
     @Override
     public Page<BankAccount> searchAccounts(AppUser user, BankAccountFilter filter, Pageable pageable) {
-        // TODO: check which user is currently provided:
-        //  - admin: no filter
-        //  - user: add filter
-        filter.setOwnerId(user.getId());
+        // Filtering by owner
+        if (!user.getAuthorities().contains(AppAuthority.ACCOUNTS_VIEW_ALL)) {
+            filter.setOwner(user.getUsername());
+        }
         return sqlBankAccountRepositoryService.findAll(filter, pageable);
     }
 
     @Override
     public Optional<BankAccount> getAccount(AppUser user, String accountNumber) {
-        // TODO: check which user is currently provided:
-        //  - admin: no filter
-        //  - user: add filter
         final BankAccountFilter filter = BankAccountFilter.builder()
-                .ownerId(user.getId())
                 .accountNumber(accountNumber)
                 .build();
+        // Filtering by owner
+        if (!user.getAuthorities().contains(AppAuthority.ACCOUNTS_VIEW_ALL)) {
+            filter.setOwner(user.getUsername());
+        }
         return sqlBankAccountRepositoryService.findOne(filter);
     }
 

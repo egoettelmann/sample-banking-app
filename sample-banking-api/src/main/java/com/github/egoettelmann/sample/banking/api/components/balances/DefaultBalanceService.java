@@ -59,8 +59,7 @@ class DefaultBalanceService implements BalanceService {
         sqlBalanceRepositoryService.save(originBalance);
 
         // Adding to beneficiary account if it exists
-        // TODO: use technical account to retrieve beneficiary account
-        final Optional<BankAccount> beneficiaryAccount = this.bankAccountService.getAccount(user, beneficiaryAccountNumber);
+        final Optional<BankAccount> beneficiaryAccount = this.bankAccountService.getAccount(AppUser.technical(), beneficiaryAccountNumber);
         if (!beneficiaryAccount.isPresent()) {
             return;
         }

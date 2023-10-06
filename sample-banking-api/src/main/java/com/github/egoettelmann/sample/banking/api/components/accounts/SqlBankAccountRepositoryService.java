@@ -58,11 +58,11 @@ class SqlBankAccountRepositoryService {
             }
 
             // Owner
-            if (filter.getOwnerId() != null) {
+            if (StringUtils.isNotBlank(filter.getOwner())) {
                 predicates.add(
                         criteriaBuilder.equal(
-                                root.get(BankAccountDbo.Fields.userId),
-                                filter.getOwnerId()
+                                root.get(BankAccountDbo.Fields.owner),
+                                filter.getOwner()
                         )
                 );
             }

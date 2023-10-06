@@ -4,11 +4,16 @@ import lombok.Data;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 @Data
 public class AppUser {
 
-    private Long id;
-    private String username;
+    private final String username;
+
+    private final Set<AppAuthority> authorities;
 
     public static AppUser current() {
         if (SecurityContextHolder.getContext() == null
@@ -24,4 +29,10 @@ public class AppUser {
         return (AppUser) principal;
     }
 
+    public static AppUser technical() {
+        return new AppUser(
+                "TECHNICAL",
+                new HashSet<>(Arrays.asList(AppAuthority.values()))
+        );
+    }
 }

@@ -5,6 +5,7 @@ import com.github.egoettelmann.sample.auth.api.core.dtos.AppUserDetails;
 import com.github.egoettelmann.sample.auth.api.core.dtos.User;
 import com.github.egoettelmann.sample.auth.api.core.dtos.requests.UserRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,7 +36,8 @@ public class UserInfoController {
      */
     @GetMapping
     public User getCurrentUserInfo() {
-        return userInfoService.getUserInfo(AppUserDetails.current());
+        return userInfoService.getUserInfo(AppUserDetails.current())
+                .orElseThrow(() -> new UsernameNotFoundException("No info found for current user"));
     }
 
     /**

@@ -4,5 +4,5 @@ CREATE TABLE "bank_account"
     "number"        VARCHAR(100) UNIQUE,
     "name"          TEXT,
     "currency"      VARCHAR(10),
-    "user_id"       LONG
+    "owner"         VARCHAR(100)
 )

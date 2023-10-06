@@ -2,10 +2,8 @@ package com.github.egoettelmann.sample.auth.api.components.users;
 
 import lombok.Data;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.Set;
 
 @Data
 @Entity
@@ -25,4 +23,7 @@ class UserDbo {
     @Column(name = "address")
     private String address;
 
+    @OneToMany(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id")
+    private Set<ClaimDbo> claims;
 }

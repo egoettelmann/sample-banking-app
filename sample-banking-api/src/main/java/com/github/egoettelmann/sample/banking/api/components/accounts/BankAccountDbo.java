@@ -25,7 +25,7 @@ class BankAccountDbo {
     @Column(name = "currency")
     private String currency;
 
-    @Column(name = "user_id")
-    private Long userId;
+    @Column(name = "owner")
+    private String owner;
 
 }

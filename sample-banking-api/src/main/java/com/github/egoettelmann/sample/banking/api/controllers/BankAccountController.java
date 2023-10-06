@@ -5,14 +5,11 @@ import com.github.egoettelmann.sample.banking.api.core.dtos.AppUser;
 import com.github.egoettelmann.sample.banking.api.core.dtos.BankAccount;
 import com.github.egoettelmann.sample.banking.api.core.exceptions.DataNotFoundException;
 import com.github.egoettelmann.sample.banking.api.core.requests.BankAccountFilter;
-import org.springdoc.core.converters.PageableAsQueryParam;
+import org.springdoc.core.converters.models.PageableAsQueryParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/bank-accounts")
@@ -29,7 +26,7 @@ public class BankAccountController {
 
     @GetMapping
     @PageableAsQueryParam
-    public Page<BankAccount> findBankAccounts(BankAccountFilter filter, Pageable pageable) {
+    public Page<BankAccount> findBankAccounts(@ModelAttribute BankAccountFilter filter, Pageable pageable) {
         return bankAccountService.searchAccounts(AppUser.current(), filter, pageable);
     }
 

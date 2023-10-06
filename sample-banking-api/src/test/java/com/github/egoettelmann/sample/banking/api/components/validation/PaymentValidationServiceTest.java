@@ -2,6 +2,7 @@ package com.github.egoettelmann.sample.banking.api.components.validation;
 
 import com.github.egoettelmann.sample.banking.api.core.BalanceService;
 import com.github.egoettelmann.sample.banking.api.core.PaymentValidationService;
+import com.github.egoettelmann.sample.banking.api.core.dtos.AppAuthority;
 import com.github.egoettelmann.sample.banking.api.core.dtos.AppUser;
 import com.github.egoettelmann.sample.banking.api.core.dtos.Balance;
 import com.github.egoettelmann.sample.banking.api.core.exceptions.InvalidPaymentException;
@@ -15,6 +16,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Optional;
 
 public class PaymentValidationServiceTest {
@@ -41,7 +44,7 @@ public class PaymentValidationServiceTest {
         Mockito.when(balanceService.getCurrentBalance(Mockito.any(), Mockito.anyString())).thenReturn(Optional.of(balance));
         Mockito.when(forbiddenIbanRepository.existsByIban(Mockito.anyString())).thenReturn(false);
 
-        final AppUser appUser = buildUser(1L);
+        final AppUser appUser = buildUser("user1@test.com");
         final PaymentRequest paymentRequest = buildPaymentRequest(BigDecimal.valueOf(834.56));
 
         Assertions.assertDoesNotThrow(() -> {
@@ -56,7 +59,7 @@ public class PaymentValidationServiceTest {
         Mockito.when(balanceService.getCurrentBalance(Mockito.any(), Mockito.anyString())).thenReturn(Optional.of(balance));
         Mockito.when(forbiddenIbanRepository.existsByIban(Mockito.anyString())).thenReturn(false);
 
-        final AppUser appUser = buildUser(1L);
+        final AppUser appUser = buildUser("user1@test.com");
         final PaymentRequest paymentRequest = buildPaymentRequest(BigDecimal.valueOf(834.56));
 
         Assertions.assertDoesNotThrow(() -> {
@@ -73,7 +76,7 @@ public class PaymentValidationServiceTest {
         Mockito.when(balanceService.getCurrentBalance(Mockito.any(), Mockito.anyString())).thenReturn(Optional.of(balance));
         Mockito.when(forbiddenIbanRepository.existsByIban(Mockito.anyString())).thenReturn(false);
 
-        final AppUser appUser = buildUser(1L);
+        final AppUser appUser = buildUser("user1@test.com");
         final PaymentRequest paymentRequest = buildPaymentRequest(BigDecimal.valueOf(-43.00));
 
         Assertions.assertThrows(InvalidPaymentException.class, () -> {
@@ -88,7 +91,7 @@ public class PaymentValidationServiceTest {
         Mockito.when(balanceService.getCurrentBalance(Mockito.any(), Mockito.anyString())).thenReturn(Optional.of(balance));
         Mockito.when(forbiddenIbanRepository.existsByIban(Mockito.anyString())).thenReturn(false);
 
-        final AppUser appUser = buildUser(1L);
+        final AppUser appUser = buildUser("user1@test.com");
         final PaymentRequest paymentRequest = buildPaymentRequest(BigDecimal.valueOf(43.00));
         paymentRequest.setBeneficiaryAccountNumber(paymentRequest.getOriginAccountNumber());
 
@@ -104,7 +107,7 @@ public class PaymentValidationServiceTest {
         Mockito.when(balanceService.getCurrentBalance(Mockito.any(), Mockito.anyString())).thenReturn(Optional.of(balance));
         Mockito.when(forbiddenIbanRepository.existsByIban(Mockito.anyString())).thenReturn(false);
 
-        final AppUser appUser = buildUser(1L);
+        final AppUser appUser = buildUser("user1@test.com");
         final PaymentRequest paymentRequest = buildPaymentRequest(BigDecimal.valueOf(1234.56));
 
         Assertions.assertThrows(PaymentExceedsAccountBalanceException.class, () -> {
@@ -119,7 +122,7 @@ public class PaymentValidationServiceTest {
         Mockito.when(balanceService.getCurrentBalance(Mockito.any(), Mockito.anyString())).thenReturn(Optional.of(balance));
         Mockito.when(forbiddenIbanRepository.existsByIban(Mockito.anyString())).thenReturn(true);
 
-        final AppUser appUser = buildUser(1L);
+        final AppUser appUser = buildUser("user1@test.com");
         final PaymentRequest paymentRequest = buildPaymentRequest(BigDecimal.valueOf(834));
 
         Assertions.assertThrows(ForbiddenIbanException.class, () -> {
@@ -127,11 +130,16 @@ public class PaymentValidationServiceTest {
         });
     }
 
-    private AppUser buildUser(Long userId) {
-        AppUser appUser = new AppUser();
-        appUser.setId(userId);
-        appUser.setUsername("Test User");
-        return appUser;
+    private AppUser buildUser(String userName) {
+        return new AppUser(
+                userName,
+                new HashSet<>(Arrays.asList(
+                        AppAuthority.ACCOUNTS_VIEW,
+                        AppAuthority.BALANCES_VIEW,
+                        AppAuthority.PAYMENTS_VIEW,
+                        AppAuthority.PAYMENTS_CREATE
+                ))
+        );
     }
 
     private PaymentRequest buildPaymentRequest(BigDecimal amount) {

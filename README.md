@@ -53,7 +53,7 @@ Following accounts are configured to create and delete payments:
 The end-2-end tests are written with Mocha/Chai and can be executed within a Docker container.
 
 ```shell script
-docker-compose -f docker-compose.yml -f docker-compose.test.yml up --build --abort-on-container-exit -V
+docker compose -f docker-compose.yml -f docker-compose.test.yml up --build --renew-anon-volumes --force-recreate --abort-on-container-exit
 ```
 
 This will start the entire stack, with the additional test container.
