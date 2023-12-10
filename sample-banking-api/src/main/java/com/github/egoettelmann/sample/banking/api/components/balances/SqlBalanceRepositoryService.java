@@ -2,6 +2,9 @@ package com.github.egoettelmann.sample.banking.api.components.balances;
 
 import com.github.egoettelmann.sample.banking.api.core.dtos.Balance;
 import com.github.egoettelmann.sample.banking.api.core.requests.BalanceFilter;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Subquery;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -9,9 +12,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-import javax.persistence.criteria.Subquery;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -86,7 +86,7 @@ class SqlBalanceRepositoryService {
             } else {
                 final Subquery<LocalDate> subQuery = criteriaQuery.subquery(LocalDate.class);
                 final Root<BalanceDbo> root2 = subQuery.from(BalanceDbo.class);
-                subQuery.select(criteriaBuilder.greatest(root2.<LocalDate>get(BalanceDbo.Fields.valueDate)));
+                subQuery.select(criteriaBuilder.greatest(root2.get(BalanceDbo.Fields.valueDate)));
                 subQuery.where(
                         criteriaBuilder.equal(
                                 root2.get(BalanceDbo.Fields.accountNumber),

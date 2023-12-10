@@ -1,12 +1,13 @@
 package com.github.egoettelmann.sample.auth.api.components.users;
 
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 @Repository
-interface UserRepository extends PagingAndSortingRepository<UserDbo, Long> {
+interface UserRepository extends PagingAndSortingRepository<UserDbo, Long>, CrudRepository<UserDbo, Long> {
 
     Optional<UserDbo> findByUsername(String username);
 

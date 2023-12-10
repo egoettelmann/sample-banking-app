@@ -1,7 +1,7 @@
 ##################
 # Build image
 ##################
-FROM maven:3.6.3-openjdk-8 AS build-img
+FROM maven:3.9.5-amazoncorretto-21 AS build-img
 
 # Defining build folder
 WORKDIR /build
@@ -17,7 +17,7 @@ RUN mvn clean package
 ##################
 # Run image
 ##################
-FROM openjdk:8-jre-alpine
+FROM amazoncorretto:21-alpine3.18
 
 # Defining runtime folder
 WORKDIR /srv/app

@@ -1,26 +1,28 @@
 package com.github.egoettelmann.sample.banking.api.config.security;
 
 import com.github.egoettelmann.sample.banking.api.config.AppProperties;
+import jakarta.servlet.Filter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.zalando.problem.spring.web.advice.security.SecurityProblemSupport;
 
-import javax.servlet.Filter;
 import java.util.Arrays;
 
 @Slf4j
 @Configuration
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+public class SecurityConfig {
 
     /**
      * The security errors handler
@@ -62,29 +64,36 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
      * @param http the http security configuration object
      * @throws Exception configuration exception
      */
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
+    @Bean
+    protected SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         // Access control
-        http.authorizeRequests()
-                .antMatchers("/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll()
-                .anyRequest().authenticated();
+        http.authorizeHttpRequests(authorize -> authorize
+                .requestMatchers("/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll()
+                .anyRequest().authenticated()
+        );
 
-        // Adding auth filters and disabling session
-        http.sessionManagement()
+        // Disabling session
+        http.sessionManagement(management -> management
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .addFilterBefore(authorizationFilter, BasicAuthenticationFilter.class);
+        );
+
+        // Adding auth filter
+        http.addFilterBefore(authorizationFilter, BasicAuthenticationFilter.class);
 
         // Custom exception handling
-        http.exceptionHandling()
+        http.exceptionHandling(handler -> handler
                 .authenticationEntryPoint(securityProblemSupport)
-                .accessDeniedHandler(securityProblemSupport);
+                .accessDeniedHandler(securityProblemSupport)
+        );
 
         // Enabling CORS
-        http.cors();
+        http.cors(Customizer.withDefaults());
 
         // Disabling CSRF: useless with JWT authentication
-        http.csrf().disable();
+        http.csrf(CsrfConfigurer::disable);
+
+        // Building and returning filter chain
+        return http.build();
     }
 
     /**

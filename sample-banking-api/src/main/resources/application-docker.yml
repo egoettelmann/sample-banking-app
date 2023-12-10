@@ -1,9 +1,5 @@
 spring:
 
-  # Spring profiles
-  profiles:
-    include: no-auth
-
   # Datasource
   datasource:
     url: jdbc:h2:mem:testdb
@@ -14,3 +10,4 @@ spring:
 # App properties
 banking-api:
   allowed-origins: "http://localhost:4200"
+  auth: none

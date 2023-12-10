@@ -4,20 +4,23 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.egoettelmann.sample.auth.api.config.AppProperties;
 import com.github.egoettelmann.sample.auth.api.config.security.jwt.JwtTokenGenerator;
 import com.github.egoettelmann.sample.auth.api.core.dtos.TokenHolder;
+import jakarta.servlet.Filter;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationServiceException;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -29,21 +32,11 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.zalando.problem.spring.web.advice.security.SecurityProblemSupport;
 
-import javax.servlet.Filter;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.Arrays;
 
 @Slf4j
 @Configuration
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
-
-    /**
-     * The user details service
-     */
-    private final UserDetailsService userDetailsService;
+public class SecurityConfig {
 
     /**
      * The JWT token generator
@@ -73,7 +66,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     /**
      * Instantiates the Rest Security Config.
      *
-     * @param userDetailsService     the user details service
      * @param jwtTokenGenerator      the JWT token generation
      * @param securityProblemSupport the security errors handler
      * @param objectMapper           the object mapper
@@ -82,7 +74,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
      */
     @Autowired
     public SecurityConfig(
-            final UserDetailsService userDetailsService,
             final JwtTokenGenerator jwtTokenGenerator,
             final SecurityProblemSupport securityProblemSupport,
             final ObjectMapper objectMapper,
@@ -90,7 +81,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             @Qualifier("authorizationFilter") final Filter authorizationFilter
     ) {
         super();
-        this.userDetailsService = userDetailsService;
         this.jwtTokenGenerator = jwtTokenGenerator;
         this.securityProblemSupport = securityProblemSupport;
         this.objectMapper = objectMapper;
@@ -104,43 +94,52 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
      * @param http the http security configuration object
      * @throws Exception configuration exception
      */
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         // Access control
-        http.authorizeRequests()
-                .antMatchers("/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll()
-                .anyRequest().authenticated();
+        http.authorizeHttpRequests(authorize -> authorize
+                .requestMatchers("/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll()
+                .anyRequest().authenticated()
+        );
 
         // Custom exception handling for returning RestError
-        http.exceptionHandling()
+        http.exceptionHandling(handler -> handler
                 .authenticationEntryPoint(securityProblemSupport)
-                .accessDeniedHandler(securityProblemSupport);
+                .accessDeniedHandler(securityProblemSupport)
+        );
 
-        // Adding auth filters and disabling session
-        http.sessionManagement()
+        // Disabling session
+        http.sessionManagement(management -> management
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .addFilterBefore(authorizationFilter, BasicAuthenticationFilter.class);
+        );
+
+        // Adding auth filters
+        http.addFilterBefore(authorizationFilter, BasicAuthenticationFilter.class);
 
         // Login
-        http.formLogin()
+        http.formLogin(login -> login
                 .loginProcessingUrl("/api/login")
                 .usernameParameter("username")
                 .passwordParameter("password")
                 .failureHandler(loginFailureHandler())
                 .successHandler(loginSuccessHandler())
-                .permitAll();
+                .permitAll()
+        );
 
         // Logout
-        http.logout()
+        http.logout(logout -> logout
                 .logoutUrl("/api/logout")
-                .logoutSuccessHandler(logoutSuccessHandler());
+                .logoutSuccessHandler(logoutSuccessHandler())
+        );
 
         // Enabling CORS
-        http.cors();
+        http.cors(Customizer.withDefaults());
 
         // Disabling CSRF: useless with JWT authentication
-        http.csrf().disable();
+        http.csrf(CsrfConfigurer::disable);
+
+        // Building and returning filter chain
+        return http.build();
     }
 
     /**
@@ -191,7 +190,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public LogoutSuccessHandler logoutSuccessHandler() {
         return new SimpleUrlLogoutSuccessHandler() {
             @Override
-            public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+            public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
                 log.info("Logout successful");
             }
         };
@@ -212,19 +211,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         corsConfig.applyPermitDefaultValues();
         source.registerCorsConfiguration("/**", corsConfig);
         return source;
-    }
-
-    /**
-     * Configures the authentication manager by providing the user details service and the password encoder.
-     *
-     * @param authenticationManagerBuilder the authentication manager builder
-     * @throws Exception thrown if configuration fails
-     */
-    @Override
-    public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
-        authenticationManagerBuilder
-                .userDetailsService(userDetailsService)
-                .passwordEncoder(passwordEncoder());
     }
 
     /**

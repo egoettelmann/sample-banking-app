@@ -4,7 +4,7 @@ import com.github.egoettelmann.sample.banking.api.core.dtos.PaymentStatus;
 import lombok.Data;
 import lombok.experimental.FieldNameConstants;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 

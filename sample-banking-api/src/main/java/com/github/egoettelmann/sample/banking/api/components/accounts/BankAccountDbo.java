@@ -1,9 +1,8 @@
 package com.github.egoettelmann.sample.banking.api.components.accounts;
 
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.experimental.FieldNameConstants;
-
-import javax.persistence.*;
 
 @Data
 @FieldNameConstants

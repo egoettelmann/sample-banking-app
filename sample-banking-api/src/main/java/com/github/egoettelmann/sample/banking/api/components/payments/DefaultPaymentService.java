@@ -17,7 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import java.time.ZonedDateTime;
 import java.util.Optional;
 import java.util.UUID;
@@ -53,7 +53,7 @@ class DefaultPaymentService implements PaymentService {
         }
         // Checking user allowed to retrieve payments of account
         final Optional<BankAccount> bankAccount = this.bankAccountService.getAccount(user, filter.getOriginAccountNumber());
-        if (!bankAccount.isPresent()) {
+        if (bankAccount.isEmpty()) {
             throw new DataNotFoundException("No bank account found for originAccountNumber " + filter.getOriginAccountNumber());
         }
 
@@ -67,7 +67,7 @@ class DefaultPaymentService implements PaymentService {
         final Optional<BankAccount> originAccount = bankAccountService.getAccount(user, paymentRequest.getOriginAccountNumber());
 
         // Checking that current user is authorized
-        if (!originAccount.isPresent()) {
+        if (originAccount.isEmpty()) {
             throw new DataNotFoundException("No bank account found for originAccountNumber " + paymentRequest.getOriginAccountNumber());
         }
 
