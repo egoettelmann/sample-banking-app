@@ -5,6 +5,7 @@ import com.github.egoettelmann.sample.banking.api.core.requests.BalanceFilter;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
+import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -59,6 +60,12 @@ class SqlBalanceRepositoryService {
                 balanceMapper.from(balance, dbo)
         );
         return balanceMapper.to(dbo);
+    }
+
+    @Transactional
+    public void saveBalancesInTransaction(Balance balance1, Balance balance2) {
+        this.save(balance1);
+        this.save(balance2);
     }
 
     private Specification<BalanceDbo> balanceSpecifications(BalanceFilter filter) {

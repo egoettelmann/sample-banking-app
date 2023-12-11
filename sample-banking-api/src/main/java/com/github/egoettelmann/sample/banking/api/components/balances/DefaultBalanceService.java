@@ -35,7 +35,7 @@ class DefaultBalanceService implements BalanceService {
     public Optional<Balance> getCurrentBalance(AppUser user, String accountNumber) {
         // Checking user allowed to retrieve balance of account
         final Optional<BankAccount> bankAccount = this.bankAccountService.getAccount(user, accountNumber);
-        if (!bankAccount.isPresent()) {
+        if (bankAccount.isEmpty()) {
             return Optional.empty();
         }
 
@@ -49,23 +49,25 @@ class DefaultBalanceService implements BalanceService {
     public void registerTransaction(AppUser user, String originAccountNumber, String beneficiaryAccountNumber, BigDecimal amount) {
         // Checking user allowed to register transaction on account
         final Optional<BankAccount> originBankAccount = this.bankAccountService.getAccount(user, originAccountNumber);
-        if (!originBankAccount.isPresent()) {
+        if (originBankAccount.isEmpty()) {
             throw new DataNotFoundException("No bank account found with number " + originAccountNumber);
         }
 
         // Removing from origin account
         final Balance originBalance = getProvisionalBalance(originAccountNumber);
         originBalance.setValue(originBalance.getValue().subtract(amount));
-        sqlBalanceRepositoryService.save(originBalance);
 
-        // Adding to beneficiary account if it exists
+        // Checking beneficiary account if it exists
         final Optional<BankAccount> beneficiaryAccount = this.bankAccountService.getAccount(AppUser.technical(), beneficiaryAccountNumber);
-        if (!beneficiaryAccount.isPresent()) {
+        if (beneficiaryAccount.isEmpty()) {
+            sqlBalanceRepositoryService.save(originBalance);
             return;
         }
+
+        // Beneficiary balance exists: saving both
         final Balance beneficiaryBalance = getProvisionalBalance(beneficiaryAccountNumber);
         beneficiaryBalance.setValue(beneficiaryBalance.getValue().add(amount));
-        sqlBalanceRepositoryService.save(beneficiaryBalance);
+        sqlBalanceRepositoryService.saveBalancesInTransaction(originBalance, beneficiaryBalance);
     }
 
     private Balance getProvisionalBalance(String accountNumber) {
@@ -73,7 +75,7 @@ class DefaultBalanceService implements BalanceService {
                 .accountNumber(accountNumber)
                 .build();
         final Optional<Balance> balance = sqlBalanceRepositoryService.findOne(filter);
-        if (!balance.isPresent()) {
+        if (balance.isEmpty()) {
             throw new DataNotFoundException("No balance found for account " + accountNumber);
         }
 

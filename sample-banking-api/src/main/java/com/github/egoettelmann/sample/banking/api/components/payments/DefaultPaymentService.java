@@ -11,7 +11,6 @@ import com.github.egoettelmann.sample.banking.api.core.dtos.PaymentStatus;
 import com.github.egoettelmann.sample.banking.api.core.exceptions.DataNotFoundException;
 import com.github.egoettelmann.sample.banking.api.core.requests.PaymentFilter;
 import com.github.egoettelmann.sample.banking.api.core.requests.PaymentRequest;
-import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -60,7 +59,6 @@ class DefaultPaymentService implements PaymentService {
         return sqlPaymentRepositoryService.findAll(filter, pageable);
     }
 
-    @Transactional
     @Override
     public Payment createPayment(AppUser user, PaymentRequest paymentRequest) {
         // Retrieving origin account

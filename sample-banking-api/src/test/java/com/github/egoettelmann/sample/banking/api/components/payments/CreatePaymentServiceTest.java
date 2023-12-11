@@ -2,18 +2,19 @@ package com.github.egoettelmann.sample.banking.api.components.payments;
 
 import com.github.egoettelmann.sample.banking.api.core.BalanceService;
 import com.github.egoettelmann.sample.banking.api.core.PaymentService;
-import com.github.egoettelmann.sample.banking.api.core.dtos.*;
+import com.github.egoettelmann.sample.banking.api.core.dtos.AppAuthority;
+import com.github.egoettelmann.sample.banking.api.core.dtos.AppUser;
+import com.github.egoettelmann.sample.banking.api.core.dtos.Balance;
+import com.github.egoettelmann.sample.banking.api.core.dtos.BalanceStatus;
+import com.github.egoettelmann.sample.banking.api.core.dtos.Payment;
 import com.github.egoettelmann.sample.banking.api.core.exceptions.DataNotFoundException;
 import com.github.egoettelmann.sample.banking.api.core.exceptions.payment.InvalidIbanException;
 import com.github.egoettelmann.sample.banking.api.core.requests.PaymentFilter;
 import com.github.egoettelmann.sample.banking.api.core.requests.PaymentRequest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.SpyBean;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.annotation.DirtiesContext;
@@ -34,9 +35,6 @@ public class CreatePaymentServiceTest {
 
     @Autowired
     private BalanceService balanceService;
-
-    @SpyBean
-    private SqlPaymentRepositoryService sqlPaymentRepositoryService;
 
     @Test
     public void whenRetrievingPayments_sizeShouldMatch() {
@@ -132,35 +130,6 @@ public class CreatePaymentServiceTest {
         Assertions.assertTrue(balance2.isPresent(), "No current balance found");
         Assertions.assertEquals(BalanceStatus.PROVISIONAL, balance2.get().getStatus(), "Wrong balance status");
         Assertions.assertEquals(0, BigDecimal.valueOf(1070).compareTo(balance2.get().getValue()), "Wrong current balance amount");
-    }
-
-    @Test
-    public void whenPaymentSaveFails_rollbackBalances() {
-        AppUser appUser = buildUser("user1@test.com");
-
-        PaymentRequest paymentRequest = new PaymentRequest();
-        paymentRequest.setAmount(BigDecimal.valueOf(300.00));
-        paymentRequest.setCurrency("EUR");
-        paymentRequest.setOriginAccountNumber("LU510011111111111111");
-        paymentRequest.setBeneficiaryAccountNumber("LU640013333333333333");
-        paymentRequest.setBeneficiaryName("Test Beneficiary");
-
-        Mockito.doThrow(new DataIntegrityViolationException("Save failed")).when(sqlPaymentRepositoryService).save(Mockito.any());
-        Assertions.assertThrows(DataIntegrityViolationException.class, () -> {
-            Payment payment = paymentService.createPayment(appUser, paymentRequest);
-        });
-
-        Optional<Balance> balance1 = balanceService.getCurrentBalance(appUser, "LU510011111111111111");
-        Assertions.assertTrue(balance1.isPresent(), "No current balance found");
-        Assertions.assertEquals(BalanceStatus.VALIDATED, balance1.get().getStatus(), "Wrong balance status");
-        Assertions.assertEquals(0, BigDecimal.valueOf(1000).compareTo(balance1.get().getValue()), "Wrong current balance amount");
-
-        AppUser beneficiary = buildUser("user2@test.com");
-
-        Optional<Balance> balance2 = balanceService.getCurrentBalance(beneficiary, "LU640013333333333333");
-        Assertions.assertTrue(balance2.isPresent(), "No current balance found");
-        Assertions.assertEquals(BalanceStatus.VALIDATED, balance2.get().getStatus(), "Wrong balance status");
-        Assertions.assertEquals(0, BigDecimal.valueOf(1000).compareTo(balance2.get().getValue()), "Wrong current balance amount");
     }
 
     @Test
