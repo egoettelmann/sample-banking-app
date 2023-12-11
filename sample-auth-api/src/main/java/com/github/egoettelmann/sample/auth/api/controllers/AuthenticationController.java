@@ -2,7 +2,10 @@ package com.github.egoettelmann.sample.auth.api.controllers;
 
 import com.github.egoettelmann.sample.auth.api.core.dtos.TokenHolder;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Authentication API specification for Swagger documentation and Code Generation.

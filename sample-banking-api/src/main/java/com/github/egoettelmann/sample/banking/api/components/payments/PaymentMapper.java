@@ -1,7 +1,11 @@
 package com.github.egoettelmann.sample.banking.api.components.payments;
 
 import com.github.egoettelmann.sample.banking.api.core.dtos.Payment;
-import org.mapstruct.*;
+import org.mapstruct.BeanMapping;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.ReportingPolicy;
 
 @Mapper(
         componentModel = "spring",

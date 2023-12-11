@@ -11,13 +11,13 @@ import com.github.egoettelmann.sample.banking.api.core.dtos.PaymentStatus;
 import com.github.egoettelmann.sample.banking.api.core.exceptions.DataNotFoundException;
 import com.github.egoettelmann.sample.banking.api.core.requests.PaymentFilter;
 import com.github.egoettelmann.sample.banking.api.core.requests.PaymentRequest;
+import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import jakarta.transaction.Transactional;
 import java.time.ZonedDateTime;
 import java.util.Optional;
 import java.util.UUID;

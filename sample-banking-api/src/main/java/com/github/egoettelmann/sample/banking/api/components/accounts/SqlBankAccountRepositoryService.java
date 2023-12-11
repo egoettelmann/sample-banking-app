@@ -2,6 +2,7 @@ package com.github.egoettelmann.sample.banking.api.components.accounts;
 
 import com.github.egoettelmann.sample.banking.api.core.dtos.BankAccount;
 import com.github.egoettelmann.sample.banking.api.core.requests.BankAccountFilter;
+import jakarta.persistence.criteria.Predicate;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -9,7 +10,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import jakarta.persistence.criteria.Predicate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;

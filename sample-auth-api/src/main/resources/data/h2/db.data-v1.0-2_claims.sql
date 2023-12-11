@@ -1,5 +1,5 @@
 INSERT INTO "CLAIM"
-    ("VALUE", "USER_ID")
+    ("VALUE", "USER_ID", "VERSION")
 VALUES
-    ('CUSTOMER', 1),
-    ('CUSTOMER', 2);
+    ('CUSTOMER', 1, 0),
+    ('CUSTOMER', 2, 0);

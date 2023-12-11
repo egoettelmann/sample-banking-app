@@ -1,8 +1,8 @@
 package com.github.egoettelmann.sample.banking.api.core.requests;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
 @Data

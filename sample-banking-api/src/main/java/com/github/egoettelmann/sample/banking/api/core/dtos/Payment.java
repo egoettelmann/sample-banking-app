@@ -17,5 +17,6 @@ public class Payment {
     private String communication;
     private ZonedDateTime creationDate;
     private PaymentStatus status;
+    private Long version;
 
 }

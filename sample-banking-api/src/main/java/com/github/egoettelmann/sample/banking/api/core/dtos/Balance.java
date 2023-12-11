@@ -12,5 +12,6 @@ public class Balance {
     private BigDecimal value;
     private LocalDate valueDate;
     private BalanceStatus status;
+    private Long version;
 
 }

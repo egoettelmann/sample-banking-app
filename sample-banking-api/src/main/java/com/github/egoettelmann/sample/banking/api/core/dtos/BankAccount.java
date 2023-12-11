@@ -9,5 +9,6 @@ public class BankAccount {
     private String name;
     private String currency;
     private String owner;
+    private Long version;
 
 }

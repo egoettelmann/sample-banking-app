@@ -1,11 +1,20 @@
 package com.github.egoettelmann.sample.auth.api.components.users;
 
-import lombok.Data;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import jakarta.persistence.Version;
+import lombok.Getter;
+import lombok.Setter;
 
-import jakarta.persistence.*;
 import java.util.Set;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "USER")
 class UserDbo {
@@ -22,6 +31,10 @@ class UserDbo {
 
     @Column(name = "ADDRESS")
     private String address;
+
+    @Version
+    @Column(name = "VERSION")
+    private Long version;
 
     @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "USER_ID")

@@ -1,10 +1,18 @@
 package com.github.egoettelmann.sample.banking.api.components.accounts;
 
-import jakarta.persistence.*;
-import lombok.Data;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.Version;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 
-@Data
+@Getter
+@Setter
 @FieldNameConstants
 @Entity
 @Table(name = "BANK_ACCOUNT")
@@ -26,5 +34,9 @@ class BankAccountDbo {
 
     @Column(name = "OWNER")
     private String owner;
+
+    @Version
+    @Column(name = "VERSION")
+    private Long version;
 
 }

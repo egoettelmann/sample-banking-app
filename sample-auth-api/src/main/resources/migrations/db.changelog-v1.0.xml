@@ -20,6 +20,9 @@
             <column name="ADDRESS" type="VARCHAR(4000)">
                 <constraints nullable="false"/>
             </column>
+            <column name="VERSION" type="BIGINT(19)">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
     </changeSet>
 
@@ -38,7 +41,10 @@
             <column name="VALUE" type="VARCHAR(100)">
                 <constraints nullable="false"/>
             </column>
-            <column name="USER_ID" type="BIGINT(10)">
+            <column name="USER_ID" type="BIGINT(19)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="VERSION" type="BIGINT(19)">
                 <constraints nullable="false"/>
             </column>
         </createTable>

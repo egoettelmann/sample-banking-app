@@ -1,14 +1,24 @@
 package com.github.egoettelmann.sample.banking.api.components.payments;
 
 import com.github.egoettelmann.sample.banking.api.core.dtos.PaymentStatus;
-import lombok.Data;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.Version;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 
-import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 
-@Data
+@Getter
+@Setter
 @FieldNameConstants
 @Entity
 @Table(name = "PAYMENT")
@@ -42,6 +52,10 @@ class PaymentDbo {
 
     @Column(name = "CREATION_DATE")
     private ZonedDateTime creationDate;
+
+    @Version
+    @Column(name = "VERSION")
+    private Long version;
 
     @Column(name = "STATUS")
     @Enumerated(EnumType.STRING)

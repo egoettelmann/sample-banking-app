@@ -2,7 +2,6 @@ package com.github.egoettelmann.sample.banking.api.core;
 
 import com.github.egoettelmann.sample.banking.api.core.dtos.AppUser;
 import com.github.egoettelmann.sample.banking.api.core.dtos.Balance;
-import com.github.egoettelmann.sample.banking.api.core.dtos.BalanceStatus;
 
 import java.math.BigDecimal;
 import java.util.Optional;

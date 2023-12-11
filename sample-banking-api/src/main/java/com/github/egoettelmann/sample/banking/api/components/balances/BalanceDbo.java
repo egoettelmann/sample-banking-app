@@ -1,14 +1,24 @@
 package com.github.egoettelmann.sample.banking.api.components.balances;
 
 import com.github.egoettelmann.sample.banking.api.core.dtos.BalanceStatus;
-import lombok.Data;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.Version;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 
-import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-@Data
+@Getter
+@Setter
 @FieldNameConstants
 @Entity
 @Table(name = "BALANCE")
@@ -31,5 +41,9 @@ class BalanceDbo {
     @Column(name = "STATUS")
     @Enumerated(EnumType.STRING)
     private BalanceStatus status;
+
+    @Version
+    @Column(name = "VERSION")
+    private Long version;
 
 }

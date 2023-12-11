@@ -23,6 +23,9 @@
             <column name="OWNER" type="VARCHAR(100)">
                 <constraints nullable="false"/>
             </column>
+            <column name="VERSION" type="BIGINT(19)">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
     </changeSet>
 
@@ -56,13 +59,14 @@
             <column name="BENEFICIARY_NAME" type="VARCHAR(4000)">
                 <constraints nullable="false"/>
             </column>
-            <column name="COMMUNICATION" type="VARCHAR(4000)">
-                <constraints nullable="false"/>
-            </column>
+            <column name="COMMUNICATION" type="VARCHAR(4000)" />
             <column name="CREATION_DATE" type="TIMESTAMP(3)">
                 <constraints nullable="false"/>
             </column>
             <column name="STATUS" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="VERSION" type="BIGINT(19)">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -81,6 +85,9 @@
                 <constraints primaryKey="true" primaryKeyName="PK_FORBIDDEN_IBAN_ID"/>
             </column>
             <column name="IBAN" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="VERSION" type="BIGINT(19)">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -108,6 +115,9 @@
                 <constraints nullable="false"/>
             </column>
             <column name="STATUS" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="VERSION" type="BIGINT(19)">
                 <constraints nullable="false"/>
             </column>
         </createTable>
