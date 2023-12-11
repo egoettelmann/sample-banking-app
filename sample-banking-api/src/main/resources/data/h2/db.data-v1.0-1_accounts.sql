@@ -1,5 +1,5 @@
-INSERT INTO "bank_account"
-    ( "number", "name", "currency", "owner")
+INSERT INTO "BANK_ACCOUNT"
+    ( "NUMBER", "NAME", "CURRENCY", "OWNER")
  VALUES
     ('LU510011111111111111', 'Account #1.1', 'EUR', 'user1@test.com'),
     ('LU090012222222222222', 'Account #1.2', 'EUR', 'user1@test.com'),

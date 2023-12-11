@@ -86,7 +86,7 @@ class SqlBalanceRepositoryService {
             } else {
                 final Subquery<LocalDate> subQuery = criteriaQuery.subquery(LocalDate.class);
                 final Root<BalanceDbo> root2 = subQuery.from(BalanceDbo.class);
-                subQuery.select(criteriaBuilder.greatest(root2.get(BalanceDbo.Fields.valueDate)));
+                subQuery.select(criteriaBuilder.greatest(root2.<LocalDate>get(BalanceDbo.Fields.valueDate)));
                 subQuery.where(
                         criteriaBuilder.equal(
                                 root2.get(BalanceDbo.Fields.accountNumber),

@@ -1,5 +1,5 @@
-INSERT INTO "forbidden_iban"
-    ("iban")
+INSERT INTO "FORBIDDEN_IBAN"
+    ("IBAN")
 VALUES
     ('LU280019400644750000'),
     ('LU120010001234567891');

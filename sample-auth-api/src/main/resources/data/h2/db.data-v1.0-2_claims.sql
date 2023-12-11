@@ -1,5 +1,5 @@
-INSERT INTO "claim"
-    ("value", "user_id")
+INSERT INTO "CLAIM"
+    ("VALUE", "USER_ID")
 VALUES
     ('CUSTOMER', 1),
     ('CUSTOMER', 2);

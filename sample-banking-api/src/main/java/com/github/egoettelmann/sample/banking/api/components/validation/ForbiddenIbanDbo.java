@@ -9,14 +9,14 @@ import jakarta.persistence.Table;
 
 @Data
 @Entity
-@Table(name = "forbidden_iban")
+@Table(name = "FORBIDDEN_IBAN")
 class ForbiddenIbanDbo {
 
     @Id
-    @Column(name = "id")
+    @Column(name = "ID")
     private Long id;
 
-    @Column(name = "iban")
+    @Column(name = "IBAN")
     private String iban;
 
 }

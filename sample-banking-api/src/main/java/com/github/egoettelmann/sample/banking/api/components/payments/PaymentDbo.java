@@ -11,39 +11,39 @@ import java.time.ZonedDateTime;
 @Data
 @FieldNameConstants
 @Entity
-@Table(name = "payment")
+@Table(name = "PAYMENT")
 class PaymentDbo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "ID")
     private Long id;
 
-    @Column(name = "reference")
+    @Column(name = "REFERENCE")
     private String reference;
 
-    @Column(name = "amount")
+    @Column(name = "AMOUNT")
     private BigDecimal amount;
 
-    @Column(name = "currency")
+    @Column(name = "CURRENCY")
     private String currency;
 
-    @Column(name = "origin_account_number")
+    @Column(name = "ORIGIN_ACCOUNT_NUMBER")
     private String originAccountNumber;
 
-    @Column(name = "beneficiary_account_number")
+    @Column(name = "BENEFICIARY_ACCOUNT_NUMBER")
     private String beneficiaryAccountNumber;
 
-    @Column(name = "beneficiary_name")
+    @Column(name = "BENEFICIARY_NAME")
     private String beneficiaryName;
 
-    @Column(name = "communication")
+    @Column(name = "COMMUNICATION")
     private String communication;
 
-    @Column(name = "creation_date")
+    @Column(name = "CREATION_DATE")
     private ZonedDateTime creationDate;
 
-    @Column(name = "status")
+    @Column(name = "STATUS")
     @Enumerated(EnumType.STRING)
     private PaymentStatus status;
 

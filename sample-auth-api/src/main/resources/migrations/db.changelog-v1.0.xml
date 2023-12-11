@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd">
+
+    <!-- User table -->
+    <changeSet id="v1.0-1" author="elio.goettelmann">
+        <createTable tableName="USER">
+            <column name="ID" autoIncrement="true" type="BIGINT(19)">
+                <constraints primaryKey="true" primaryKeyName="PK_USER_ID"/>
+            </column>
+            <column name="USERNAME" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="PASSWORD" type="VARCHAR(4000)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ADDRESS" type="VARCHAR(4000)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="v1.0-2" author="elio.goettelmann">
+        <addUniqueConstraint tableName="USER" columnNames="USERNAME"
+                             constraintName="UK_USER_USERNAME"
+        />
+    </changeSet>
+
+    <!-- Claim table -->
+    <changeSet id="v1.0-3" author="elio.goettelmann">
+        <createTable tableName="CLAIM">
+            <column name="ID" autoIncrement="true" type="BIGINT(19)">
+                <constraints primaryKey="true" primaryKeyName="PK_CLAIM_ID"/>
+            </column>
+            <column name="VALUE" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="USER_ID" type="BIGINT(10)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="v1.0-4" author="elio.goettelmann">
+        <addForeignKeyConstraint baseTableName="CLAIM" baseColumnNames="USER_ID"
+                                 referencedColumnNames="ID" referencedTableName="USER"
+                                 constraintName="FK_CLAIM_ID"
+                                 onDelete="RESTRICT" onUpdate="RESTRICT"
+                                 deferrable="false" initiallyDeferred="false"
+        />
+    </changeSet>
+
+    <changeSet id="v1.0-5" author="elio.goettelmann">
+        <addUniqueConstraint tableName="CLAIM" columnNames="VALUE, USER_ID"
+                             constraintName="UK_CLAIM_VALUE_USER_ID"
+        />
+    </changeSet>
+
+</databaseChangeLog>

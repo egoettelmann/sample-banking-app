@@ -7,23 +7,23 @@ import java.util.Set;
 
 @Data
 @Entity
-@Table(name = "user")
+@Table(name = "USER")
 class UserDbo {
 
     @Id
-    @Column(name = "id")
+    @Column(name = "ID")
     private Long id;
 
-    @Column(name = "username")
+    @Column(name = "USERNAME")
     private String username;
 
-    @Column(name = "password")
+    @Column(name = "PASSWORD")
     private String password;
 
-    @Column(name = "address")
+    @Column(name = "ADDRESS")
     private String address;
 
     @OneToMany(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "USER_ID")
     private Set<ClaimDbo> claims;
 }

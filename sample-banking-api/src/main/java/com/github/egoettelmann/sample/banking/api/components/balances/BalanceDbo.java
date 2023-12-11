@@ -11,24 +11,24 @@ import java.time.LocalDate;
 @Data
 @FieldNameConstants
 @Entity
-@Table(name = "balance")
+@Table(name = "BALANCE")
 class BalanceDbo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "ID")
     private Long id;
 
-    @Column(name = "account_number")
+    @Column(name = "ACCOUNT_NUMBER")
     private String accountNumber;
 
-    @Column(name = "value")
+    @Column(name = "VALUE")
     private BigDecimal value;
 
-    @Column(name = "valueDate")
+    @Column(name = "VALUE_DATE")
     private LocalDate valueDate;
 
-    @Column(name = "status")
+    @Column(name = "STATUS")
     @Enumerated(EnumType.STRING)
     private BalanceStatus status;
 

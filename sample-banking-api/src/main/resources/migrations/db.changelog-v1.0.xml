@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd">
+
+    <!-- BankAccount table -->
+    <changeSet id="v1.0-1" author="elio.goettelmann">
+        <createTable tableName="BANK_ACCOUNT">
+            <column name="ID" autoIncrement="true" type="BIGINT(19)">
+                <constraints primaryKey="true" primaryKeyName="PK_BANK_ACCOUNT_ID"/>
+            </column>
+            <column name="NUMBER" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="NAME" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="CURRENCY" type="VARCHAR(10)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="OWNER" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="v1.0-2" author="elio.goettelmann">
+        <addUniqueConstraint tableName="BANK_ACCOUNT" columnNames="NUMBER"
+                             constraintName="UK_BANK_ACCOUNT_NUMBER"
+        />
+    </changeSet>
+
+    <!-- Payment table -->
+    <changeSet id="v1.0-3" author="elio.goettelmann">
+        <createTable tableName="PAYMENT">
+            <column name="ID" autoIncrement="true" type="BIGINT(19)">
+                <constraints primaryKey="true" primaryKeyName="PK_PAYMENT_ID"/>
+            </column>
+            <column name="REFERENCE" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="AMOUNT" type="DECIMAL(23, 6)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="CURRENCY" type="VARCHAR(10)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ORIGIN_ACCOUNT_NUMBER" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="BENEFICIARY_ACCOUNT_NUMBER" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="BENEFICIARY_NAME" type="VARCHAR(4000)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="COMMUNICATION" type="VARCHAR(4000)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="CREATION_DATE" type="TIMESTAMP(3)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="STATUS" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="v1.0-4" author="elio.goettelmann">
+        <addUniqueConstraint tableName="PAYMENT" columnNames="REFERENCE"
+                             constraintName="UK_PAYMENT_REFERENCE"
+        />
+    </changeSet>
+
+    <!-- ForbiddenIban table -->
+    <changeSet id="v1.0-5" author="elio.goettelmann">
+        <createTable tableName="FORBIDDEN_IBAN">
+            <column name="ID" autoIncrement="true" type="BIGINT(19)">
+                <constraints primaryKey="true" primaryKeyName="PK_FORBIDDEN_IBAN_ID"/>
+            </column>
+            <column name="IBAN" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="v1.0-6" author="elio.goettelmann">
+        <addUniqueConstraint tableName="FORBIDDEN_IBAN" columnNames="IBAN"
+                             constraintName="UK_FORBIDDEN_IBAN"
+        />
+    </changeSet>
+
+    <!-- Balance table -->
+    <changeSet id="v1.0-7" author="elio.goettelmann">
+        <createTable tableName="BALANCE">
+            <column name="ID" autoIncrement="true" type="BIGINT(19)">
+                <constraints primaryKey="true" primaryKeyName="PK_BALANCE_ID"/>
+            </column>
+            <column name="ACCOUNT_NUMBER" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="VALUE" type="DECIMAL(23, 6)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="VALUE_DATE" type="TIMESTAMP(3)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="STATUS" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="v1.0-8" author="elio.goettelmann">
+        <addUniqueConstraint tableName="BALANCE" columnNames="ACCOUNT_NUMBER, VALUE_DATE"
+                             constraintName="UK_ACCOUNT_NUMBER_VALUE_DATE"
+        />
+    </changeSet>
+
+</databaseChangeLog>

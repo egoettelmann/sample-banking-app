@@ -8,14 +8,14 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "claim")
+@Table(name = "CLAIM")
 class ClaimDbo {
 
     @Id
-    @Column(name = "id")
+    @Column(name = "ID")
     private Long id;
 
-    @Column(name = "value")
+    @Column(name = "VALUE")
     private String value;
 
 }

@@ -27,7 +27,7 @@ class DefaultUserDetailsService implements UserDetailsService, UserInfoService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         final Optional<User> user = sqlUserRepositoryService.getUser(username);
-        if (!user.isPresent()) {
+        if (user.isEmpty()) {
             throw new UsernameNotFoundException("No user found with username: " + username);
         }
         return user.map(u -> new AppUserDetails(
@@ -45,7 +45,7 @@ class DefaultUserDetailsService implements UserDetailsService, UserInfoService {
     @Override
     public User updateUserInfo(AppUserDetails appUser, UserRequest userRequest) {
         final Optional<User> existing = sqlUserRepositoryService.getUser(appUser.getUsername());
-        if (!existing.isPresent()) {
+        if (existing.isEmpty()) {
             throw new UsernameNotFoundException("No user found with username: " + appUser.getUsername());
         }
         final User user = existing.get();

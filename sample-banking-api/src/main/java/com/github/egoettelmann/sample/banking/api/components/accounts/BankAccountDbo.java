@@ -7,24 +7,24 @@ import lombok.experimental.FieldNameConstants;
 @Data
 @FieldNameConstants
 @Entity
-@Table(name = "bank_account")
+@Table(name = "BANK_ACCOUNT")
 class BankAccountDbo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "ID")
     private Long id;
 
-    @Column(name = "number")
+    @Column(name = "NUMBER")
     private String number;
 
-    @Column(name = "name")
+    @Column(name = "NAME")
     private String name;
 
-    @Column(name = "currency")
+    @Column(name = "CURRENCY")
     private String currency;
 
-    @Column(name = "owner")
+    @Column(name = "OWNER")
     private String owner;
 
 }

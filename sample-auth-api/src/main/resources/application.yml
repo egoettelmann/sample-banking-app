@@ -8,6 +8,10 @@ spring:
   mvc:
     throw-exception-if-no-handler-found: true
 
-  # Flyway
-  flyway:
-    locations: "classpath:migrations/{vendor}"
+  # Liquibase
+  liquibase:
+    change-log: "classpath:migrations/db.changelog-master.xml"
+  sql:
+    init:
+      platform: "h2"
+      data-locations: "optional:classpath*:data/h2/db.data-*.sql"
