@@ -9,6 +9,8 @@ import org.springdoc.core.converters.models.PageableAsQueryParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,13 +32,15 @@ public class BankAccountController {
 
     @GetMapping
     @PageableAsQueryParam
-    public Page<BankAccount> findBankAccounts(@ModelAttribute BankAccountFilter filter, Pageable pageable) {
-        return bankAccountService.searchAccounts(AppUser.current(), filter, pageable);
+    @PreAuthorize("hasAuthority(T(com.github.egoettelmann.sample.banking.api.core.dtos.AppAuthority).ACCOUNTS_VIEW.name())")
+    public Page<BankAccount> findBankAccounts(@ModelAttribute BankAccountFilter filter, Pageable pageable, @AuthenticationPrincipal AppUser appUser) {
+        return bankAccountService.searchAccounts(appUser, filter, pageable);
     }
 
     @GetMapping("/{accountNumber}")
-    public BankAccount getBankAccount(@PathVariable("accountNumber") String accountNumber) {
-        return bankAccountService.getAccount(AppUser.current(), accountNumber)
+    @PreAuthorize("hasAuthority(T(com.github.egoettelmann.sample.banking.api.core.dtos.AppAuthority).ACCOUNTS_VIEW.name())")
+    public BankAccount getBankAccount(@PathVariable("accountNumber") String accountNumber, @AuthenticationPrincipal AppUser appUser) {
+        return bankAccountService.getAccount(appUser, accountNumber)
                 .orElseThrow(() -> new DataNotFoundException("No bank account found for number " + accountNumber));
     }
 

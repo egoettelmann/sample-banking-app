@@ -12,6 +12,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,18 +33,22 @@ public class PaymentController {
 
     @GetMapping
     @PageableAsQueryParam
+    @PreAuthorize("hasAuthority(T(com.github.egoettelmann.sample.banking.api.core.dtos.AppAuthority).PAYMENTS_VIEW.name())")
     public Page<Payment> findAllPayments(
             PaymentFilter filter,
-            @PageableDefault(sort = "creationDate", direction = Sort.Direction.DESC) Pageable pageable
+            @PageableDefault(sort = "creationDate", direction = Sort.Direction.DESC) Pageable pageable,
+            @AuthenticationPrincipal AppUser appUser
     ) {
-        return paymentService.searchPayments(AppUser.current(), filter, pageable);
+        return paymentService.searchPayments(appUser, filter, pageable);
     }
 
     @PostMapping
+    @PreAuthorize("hasAuthority(T(com.github.egoettelmann.sample.banking.api.core.dtos.AppAuthority).PAYMENTS_CREATE.name())")
     public Payment createPayment(
-            @Valid @RequestBody PaymentRequest paymentRequest
+            @Valid @RequestBody PaymentRequest paymentRequest,
+            @AuthenticationPrincipal AppUser appUser
     ) {
-        return paymentService.createPayment(AppUser.current(), paymentRequest);
+        return paymentService.createPayment(appUser, paymentRequest);
     }
 
 }

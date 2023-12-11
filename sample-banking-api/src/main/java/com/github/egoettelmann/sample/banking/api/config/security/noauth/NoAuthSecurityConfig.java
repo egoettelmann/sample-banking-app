@@ -1,5 +1,6 @@
 package com.github.egoettelmann.sample.banking.api.config.security.noauth;
 
+import com.github.egoettelmann.sample.banking.api.core.dtos.AppAuthority;
 import com.github.egoettelmann.sample.banking.api.core.dtos.AppUser;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
@@ -16,7 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Collections;
+import java.util.Set;
 
 /**
  * Allows to bypass security by defining a user through a header.
@@ -47,7 +48,12 @@ public class NoAuthSecurityConfig {
                 // Building the user details
                 AppUser user = new AppUser(
                         username,
-                        Collections.emptySet()
+                        Set.of(
+                                AppAuthority.ACCOUNTS_VIEW,
+                                AppAuthority.BALANCES_VIEW,
+                                AppAuthority.PAYMENTS_VIEW,
+                                AppAuthority.PAYMENTS_CREATE
+                        )
                 );
                 Authentication authentication = new UsernamePasswordAuthenticationToken(user, "", user.getAuthorities());
 

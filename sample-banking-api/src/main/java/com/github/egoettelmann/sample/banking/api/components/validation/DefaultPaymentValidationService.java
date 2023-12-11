@@ -58,7 +58,7 @@ public class DefaultPaymentValidationService implements PaymentValidationService
 
         // Checking that balance allows payment
         final Optional<Balance> originAccountBalance = balanceService.getCurrentBalance(user, paymentRequest.getOriginAccountNumber());
-        if (!originAccountBalance.isPresent()) {
+        if (originAccountBalance.isEmpty()) {
             throw new InvalidPaymentException("Unknown origin account " + paymentRequest.getOriginAccountNumber());
         }
         if (originAccountBalance.get().getValue().compareTo(paymentRequest.getAmount()) < 0) {
